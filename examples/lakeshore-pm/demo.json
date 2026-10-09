@@ -1,0 +1,712 @@
+{
+  "name": "Lakeshore Tourism · Project Management Demo",
+  "slug": "lakeshore-pm",
+  "storage_key": "preflight-lakeshore-pm-v1",
+  "date": "Sample demo",
+  "tagline": "PMT Console · Cal Rogers' Tuesday morning",
+  "sources": "examples/lakeshore-pm/demo-script.md",
+  "builder": "the demo builder (Mesh, Claude Code, or a teammate)",
+  "golden_record": "2026 Annual Travel Guide (PMT project)",
+  "test_record_label": "Test project (spare)",
+  "cheatsheet": "",
+  "persona": "Cal Rogers, Content Operations Manager",
+  "presenter": "",
+  "presenter_title": "",
+  "record_links": [
+    {
+      "key": "guide",
+      "label": "Travel Guide project"
+    },
+    {
+      "key": "tulsa",
+      "label": "Harbor City Tourism opp"
+    }
+  ],
+  "extra_notes": [
+    {
+      "kind": "info",
+      "title": "This is the bundled sample.",
+      "html": "Copy <code>examples/lakeshore-pm/demo.json</code>, swap in your own steps, then run <code>python3 scripts/build.py your-demo.json</code>."
+    }
+  ],
+  "reset": [
+    "Shoot Lakeshore Trail landmarks: End Date back to 9/28",
+    "Shoot state park lodge interiors: Assigned To back to Vanessa Central",
+    "Draft: North Shore feature: Sign-off back to Submitted"
+  ],
+  "agent_rules": [
+    "PMT is a managed package (Salesforce Labs). Configure around it; don't edit its metadata."
+  ],
+  "phases": [
+    {
+      "name": "Phase 0 · Setup",
+      "tag": "safe",
+      "steps": [
+        {
+          "id": "0.1",
+          "go": "home",
+          "t": "Sign in and open the PMT Console",
+          "c": [
+            "Sign in to the VisitLakeshore demo org",
+            "App Launcher → <b>PMT Console</b> (not standard PMT)"
+          ],
+          "e": [
+            "Console app opens with workspace tabs",
+            "You're logged in as the user whose name should show as <b>Cal Rogers</b> on the dashboard"
+          ],
+          "f": "If only standard PMT shows, the console app isn't assigned to your profile. Assign the app, or use standard PMT and expect clunkier tab navigation."
+        },
+        {
+          "id": "0.2",
+          "t": "Deck check: title date + slide order",
+          "c": [
+            "Open the <b>Travel Lakeshore – Project Management</b> deck (the 9-slide version)",
+            "Check the title slide, then flip through to 'From Challenge to Solved'"
+          ],
+          "e": [
+            "The title slide date reads <b>October 9, 2026</b>. It currently says September 25.",
+            "Order: Who is Salesforce → Public Sector → Current Challenges → <b>Meet Cal Rogers</b> → What Cal Is Up Against (Oct 2 press date) → <b>Cal's Journey (5 steps)</b>, where the live demo starts → From Challenge to Solved → Thank you"
+          ],
+          "f": "The script's slide numbers (5–10) are off by one compared with this 9-slide deck. Go by slide titles, not numbers."
+        },
+        {
+          "id": "0.3",
+          "go": "dash",
+          "t": "Refresh the Project Portfolio dashboard",
+          "c": [
+            "Dashboards → <b>Project Portfolio</b> → Refresh"
+          ],
+          "e": [
+            "The <b>As of</b> timestamp shows today",
+            "The running user shows <b>Cal Rogers</b>"
+          ],
+          "f": "If it shows a different user, change the dashboard's running user, or say it's Cal's view and move on."
+        },
+        {
+          "id": "0.4",
+          "t": "Write down the golden-record baseline (for the reset)",
+          "c": [
+            "Travel Guide → Tasks → use the row-action <b>▼ → View</b> on each task below"
+          ],
+          "e": [
+            "<b>Shoot Lakeshore Trail landmarks</b>: End Date = <b>Sep 28</b>",
+            "<b>Shoot state park lodge interiors</b>: Assigned To = <b>Vanessa Central</b>",
+            "<b>Draft: North Shore feature</b>: Sign-off = <b>Submitted</b>",
+            "Resources: write down the current allocations, or take a screenshot of them"
+          ],
+          "f": "If any value already differs, a previous run wasn't reset. Fix it now using the Data Reset list (step 4.1)."
+        },
+        {
+          "id": "0.5",
+          "t": "Pick the spare test record",
+          "c": [
+            "Choose a spare PMT project with tasks you can change. Clone the Travel Guide from its template if you can.",
+            "Type its name in the sidebar box"
+          ],
+          "e": [
+            "The test project has: an assigned task you can reassign, a task with an End Date, a task with Sign-off = <b>Submitted</b> routed to you, and 2+ tasks for the mass status change",
+            "Its Chatter tab has at least one existing thread"
+          ],
+          "f": "If there's no spare project and no time to clone one, run Phase 2 on the Travel Guide and do the full Data Reset (4.1) right afterward. Confirm with the builder: is there a test project?"
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 · Read-only checks (golden record)",
+      "tag": "safe",
+      "steps": [
+        {
+          "id": "1.1",
+          "go": "tulsa",
+          "t": "Opportunity: Harbor City Tourism – Lakeshore Trail Content Series",
+          "c": [
+            "Opportunities → <b>Harbor City Tourism - Lakeshore Trail Content Series</b>"
+          ],
+          "e": [
+            "Amount <b>$65,000</b>",
+            "Linked project shows <b>Lakeshore Trail Guide</b>"
+          ],
+          "f": "If there's no project link, the lookup or related list is missing from the layout. Tell the builder."
+        },
+        {
+          "id": "1.2",
+          "go": "tulsa",
+          "t": "Murray AI summary renders",
+          "c": [
+            "Stay on the opportunity and wait about 10 seconds"
+          ],
+          "e": [
+            "The <b>Murray</b> (Agentforce) summary panel renders with deal history and next actions",
+            "Nothing in it is inaccurate or embarrassing"
+          ],
+          "f": "If it doesn't render within about 10 seconds, plan to skip it live, as the script says. Note how long it took."
+        },
+        {
+          "id": "1.3",
+          "go": "guide",
+          "t": "Travel Guide → Revenue tab",
+          "c": [
+            "PMT Console → <b>2026 Annual Travel Guide</b> → <b>Revenue</b> tab"
+          ],
+          "e": [
+            "Budget Goal <b>$150,000</b>",
+            "<b>$115,000</b> closed-won, <b>77%</b> of goal",
+            "<b>$8,500</b> in pipeline",
+            "The list shows the opportunities that fund this project"
+          ],
+          "f": "If the numbers are off, an opportunity's stage or project link changed. Check the per-project funding table in the script."
+        },
+        {
+          "id": "1.4",
+          "go": "guide",
+          "t": "Summary tab: health, phases, period toggle",
+          "c": [
+            "Click the <b>Summary</b> tab",
+            "Toggle <b>Weekly → Monthly → Quarterly</b> (top right)"
+          ],
+          "e": [
+            "Health is <b>green / On Track</b>",
+            "<b>6 phases</b>: Content Planning done, Photography wrapping up, Editorial Writing underway",
+            "The toggle changes the view each time"
+          ],
+          "f": "If the phase statuses look stale, roll-ups may not have recalculated. Tell the builder."
+        },
+        {
+          "id": "1.5",
+          "go": "guide",
+          "t": "Milestone List",
+          "c": [
+            "Summary → <b>Milestone List</b> button → read it → close the modal"
+          ],
+          "e": [
+            "Editorial freeze <b>Sep 15</b>",
+            "Press-ready files <b>Oct 2</b>",
+            "Warehouse delivery <b>Dec 30</b>"
+          ],
+          "f": "Note: on Oct 9, the editorial freeze and press dates are already past. Decide how to phrase it (see the note at the top)."
+        },
+        {
+          "id": "1.6",
+          "t": "'Created from a template' proof point",
+          "c": [
+            "Find where the project shows it came from a template (field, related record or template object)"
+          ],
+          "e": [
+            "Something on screen you can point to when you say this project was created from a template"
+          ],
+          "f": "Confirm with the builder: expected ___. If nothing is visible, narrate it without pointing."
+        },
+        {
+          "id": "1.7",
+          "go": "guide",
+          "t": "Timeline (Gantt) tab",
+          "c": [
+            "Click the <b>Timeline</b> tab. <b>Don't drag anything.</b>"
+          ],
+          "e": [
+            "Bars are grouped by phase. Green = completed, blue = in progress (Lakeshore Trail photo shoot <b>75%</b>, North Shore feature), gray = upcoming",
+            "A red <b>Today</b> line",
+            "The October crunch is visible (Editorial, Design &amp; Layout, Review all overlap)"
+          ],
+          "f": "If the Today line sits after the in-progress bars, the story looks late. Consider shifting the demo dates (see the note at the top)."
+        },
+        {
+          "id": "1.8",
+          "go": "guide",
+          "t": "Resources tab + Edit Allocations (cancel only)",
+          "c": [
+            "Click the <b>Resources</b> tab",
+            "Click <b>Edit Allocations</b>, look at the grid, then click <b>Cancel</b>"
+          ],
+          "e": [
+            "Cal at <b>30%</b> as Project Manager",
+            "Vanessa at <b>40%</b> in Sep–Oct",
+            "Vince picks up during the editorial crunch",
+            "The grid is editable, and Cancel leaves everything unchanged"
+          ],
+          "f": "If the grid doesn't open, check component permissions. Tell the builder."
+        },
+        {
+          "id": "1.9",
+          "go": "guide",
+          "t": "Tasks tab: In Progress filter + row action",
+          "c": [
+            "Click the <b>Tasks</b> tab → filter to <b>In Progress</b>",
+            "On one row, click <b>▼ → View</b>. Don't click the cell value."
+          ],
+          "e": [
+            "<b>3 tasks</b>: Vince on the North Shore feature (~halfway), Vanessa on the Lakeshore Trail photo shoot (75%), Valerie on the Lakeshore Trail road trip itinerary",
+            "▼ → View opens the record without starting an inline edit"
+          ],
+          "f": "If the count isn't 3, a task's status changed since the build. Reset it, or adjust your talk track."
+        },
+        {
+          "id": "1.10",
+          "go": "guide",
+          "t": "Approval setup on North Shore draft (look only)",
+          "c": [
+            "Open <b>Draft: North Shore feature</b> (▼ → View)",
+            "Find the <b>Approval History</b> component"
+          ],
+          "e": [
+            "Sign-off = <b>Submitted</b>",
+            "Approval History shows it submitted by Vince and pending with <b>Cal</b> (you)",
+            "An <b>Approve</b> action is available to you"
+          ],
+          "f": "If Approve isn't offered, the running user isn't the approver. The fallback is flipping the picklist."
+        },
+        {
+          "id": "1.11",
+          "go": "guide",
+          "t": "Chatter & Activity + Files tabs",
+          "c": [
+            "Project → <b>Chatter &amp; Activity</b> tab",
+            "Then the <b>Files</b> tab"
+          ],
+          "e": [
+            "At least one existing thread with a <b>Reply</b> option (the compose box doesn't render on managed objects, which is expected)",
+            "The Files tab shows project files (brand assets, drafts)"
+          ],
+          "f": "If there's no thread to reply to, the builder needs to seed one. If Files is empty, confirm with the builder: expected ___."
+        },
+        {
+          "id": "1.12",
+          "go": "dash",
+          "t": "Project Portfolio dashboard components",
+          "c": [
+            "Dashboards → <b>Project Portfolio</b>"
+          ],
+          "e": [
+            "Health donut shows <b>6 projects, all on track</b>",
+            "Project Detail, Portfolio Ownership and Resource Assignments components all render",
+            "The completion gauge shows <b>226%</b> (a known quirk, so don't dwell on it)"
+          ],
+          "f": "If a component errors, refresh. If it still errors, tell the builder which component."
+        },
+        {
+          "id": "1.13",
+          "t": "Command Center + funding numbers",
+          "c": [
+            "Open the <b>Command Center</b> tab",
+            "Spot-check 2 projects' Revenue tabs (e.g. Lakeshore Trail Guide, May Conference)"
+          ],
+          "e": [
+            "KPI cards, team workload and project pipeline all render",
+            "Pipeline shows <b>$10.7M</b>, which is all org opportunities (255). The Lakeshore Tourism figure to quote is <b>$635K across 16 opps</b>.",
+            "Lakeshore Trail Guide <b>$127,000</b> of $175K · May Conference <b>$90,000</b> of $95K"
+          ],
+          "f": "If Command Center doesn't load, skip it live. It's the custom LWC example."
+        }
+      ]
+    },
+    {
+      "name": "Phase 2 · Action tests on the test record (demo order)",
+      "tag": "change",
+      "steps": [
+        {
+          "id": "2.1",
+          "t": "Edit Allocations: change and save",
+          "c": [
+            "Test project → <b>Resources</b> → <b>Edit Allocations</b>",
+            "Change one October value → <b>Save</b>"
+          ],
+          "e": [
+            "Saves without an error",
+            "The allocation table and totals update"
+          ],
+          "f": "If you get a save error, check field-level security on the allocation object. Tell the builder the exact error text."
+        },
+        {
+          "id": "2.2",
+          "t": "Reassign a task",
+          "c": [
+            "Tasks → open the shoot task (▼ → View) → change <b>Assigned To</b> from Vanessa to <b>Vince West</b> → Save"
+          ],
+          "e": [
+            "Saves, and the task list shows Vince",
+            "The Resources and Assignments views reflect the change (if they're designed to)"
+          ],
+          "f": "If the user lookup can't find Vince, the persona user or contact is missing or inactive."
+        },
+        {
+          "id": "2.3",
+          "t": "Bump an End Date",
+          "c": [
+            "Open the landmarks shoot task → change End Date <b>Sep 28 → Oct 3</b> → Save",
+            "Go back to the <b>Summary</b> tab"
+          ],
+          "e": [
+            "Saves",
+            "The phase table on Summary updates on its own, as the talk track says"
+          ],
+          "f": "If Summary doesn't update, a roll-up flow isn't firing. Either drop the line 'updates automatically' or get it fixed."
+        },
+        {
+          "id": "2.4",
+          "t": "Approve the submitted draft",
+          "c": [
+            "Open the draft task with Sign-off = <b>Submitted</b> → Approval History → <b>Approve</b>"
+          ],
+          "e": [
+            "Status changes to <b>Approved</b>",
+            "Approval History shows your approval with a timestamp",
+            "No error. Any email alert goes only to your own test address"
+          ],
+          "f": "If approval fails, use the fallback of flipping the Sign-off picklist, and tell the builder. If an email alert fires, check who received it."
+        },
+        {
+          "id": "2.5",
+          "t": "Mass status change (2 tasks)",
+          "c": [
+            "Tasks list → check <b>two rows</b> → <b>Change Status</b> → pick a status → Save"
+          ],
+          "e": [
+            "Both tasks update in one action"
+          ],
+          "f": "If the button is missing, the list view or managed-package action isn't available to you."
+        },
+        {
+          "id": "2.6",
+          "t": "Chatter reply",
+          "c": [
+            "<b>Chatter &amp; Activity</b> → <b>Reply</b> on an existing thread with a test message"
+          ],
+          "e": [
+            "The reply posts and appears in the thread"
+          ],
+          "f": "If the reply box is missing too, the live fallback is to narrate it and show the existing thread. Tell the builder."
+        },
+        {
+          "id": "2.7",
+          "t": "Timeline drag-and-drop (optional)",
+          "c": [
+            "<b>Timeline</b> → drag one bar a few days → reopen the task"
+          ],
+          "e": [
+            "The task's dates changed to match the drag"
+          ],
+          "f": "If dates don't save, drop the line 'those changes save automatically' from the talk track."
+        },
+        {
+          "id": "2.8",
+          "t": "Roll-ups after changes",
+          "c": [
+            "Refresh the test project's Summary, then the Project Portfolio dashboard"
+          ],
+          "e": [
+            "Phase % and health reflect the test changes",
+            "The dashboard refreshes without errors"
+          ],
+          "f": "Confirm with the builder: expected roll-up behavior is ___."
+        }
+      ]
+    },
+    {
+      "name": "Phase 3 · AI (look only)",
+      "tag": "safe",
+      "steps": [
+        {
+          "id": "3.1",
+          "go": "tulsa",
+          "t": "Murray summary, second look",
+          "c": [
+            "Reload the Harbor City Tourism opportunity and time how long until Murray renders"
+          ],
+          "e": [
+            "It renders consistently, and the content matches the deal"
+          ],
+          "f": "If it's slow or inconsistent, plan to skip it in the opening and mention it at the close instead."
+        }
+      ]
+    },
+    {
+      "name": "Phase 4 · Cleanup",
+      "tag": "safe",
+      "steps": [
+        {
+          "id": "4.1",
+          "t": "Data Reset (from the script)",
+          "c": [
+            "On the test project, and on the Travel Guide if you used it:",
+            "Shoot Lakeshore Trail landmarks: End Date back to <b>Sep 28</b>",
+            "Shoot state park lodge interiors: Assigned To back to <b>Vanessa Central</b>",
+            "Draft: North Shore feature: Sign-off back to <b>Submitted</b>",
+            "Revert any allocation, status or timeline changes"
+          ],
+          "e": [
+            "Every value matches your baseline from step 0.4"
+          ],
+          "f": "If the approval can't be reset to Submitted, recall or resubmit it, or ask the builder for a reset script."
+        },
+        {
+          "id": "4.2",
+          "go": "guide",
+          "t": "Golden record re-check (look only)",
+          "c": [
+            "Travel Guide → Tasks, Approval History, Resources, Revenue"
+          ],
+          "e": [
+            "Every value matches step 0.4",
+            "Revenue still shows <b>$115K / 77% / $8.5K</b>",
+            "In Progress filter still shows <b>3</b> tasks"
+          ],
+          "f": "If anything drifted, fix it now, not tomorrow morning."
+        },
+        {
+          "id": "4.3",
+          "go": "dash",
+          "t": "Stage tabs for the call",
+          "c": [
+            "Refresh the Project Portfolio dashboard on the morning of the demo",
+            "Open tabs in demo order: Deck → Opportunity → Travel Guide → Dashboard → Command Center",
+            "Close everything else"
+          ],
+          "e": [
+            "Tabs are in click-path order, and the dashboard timestamp shows today"
+          ],
+          "f": ""
+        },
+        {
+          "id": "4.4",
+          "t": "Script fixes confirmed with the AE",
+          "c": [
+            "Check the items in the note at the top of this page"
+          ],
+          "e": [
+            "Date, customer name, SE name and the pricing line are all settled"
+          ],
+          "f": ""
+        }
+      ]
+    }
+  ],
+  "video": {
+    "spec_title": "Lakeshore Tourism Runs Its Content Newsroom on One Platform",
+    "theme": "corporate",
+    "engine": "auto",
+    "wow": "Revenue, projects and team capacity on one screen. The project shows whether it's funded.",
+    "title_slide": {
+      "title": "Cal Rogers' Tuesday Morning on Salesforce",
+      "say": "Meet Cal Rogers. He runs content operations for Lakeshore Tourism, and here's how his morning goes on Salesforce.",
+      "subtitle": "Lakeshore Tourism · Project management and sponsorship revenue in the PMT Console"
+    },
+    "scenes": [
+      {
+        "id": "_intro",
+        "title": "the CMO's four criteria",
+        "card": "Useful · Easy to operate · Easy to integrate · Easy to adopt",
+        "say": "You told us what matters to your team. Useful, easy to operate, easy to integrate, easy to adopt. We built this around those four things. Let me show you what Cal Rogers' Tuesday morning looks like."
+      },
+      {
+        "id": "1.1",
+        "title": "A sponsor signs on",
+        "shot": "Harbor City Tourism opp header + PMT Project link",
+        "say": "Cal's day starts with good news. Harbor City Tourism just committed to a sixty-five thousand dollar Lakeshore Trail content series. And it's linked directly to the project it funds."
+      },
+      {
+        "id": "1.2",
+        "title": "Agentforce on the deal",
+        "shot": "Opp with the Agentforce summary panel rendered",
+        "say": "On the side, Agentforce is reading the deal history and flagging what needs attention. No digging required."
+      },
+      {
+        "id": "1.3",
+        "title": "Revenue tied to the work",
+        "shot": "Project Revenue tab: tracker + funding opps",
+        "say": "Here's the revenue tab. A budget tracker, closed won against goal, and every opportunity that funds this project. Cal doesn't have to call the sales team. He just looks."
+      },
+      {
+        "id": "1.4",
+        "title": "The project at a glance",
+        "shot": "Summary tab: health, phases, period toggle",
+        "say": "This is what Cal sees every morning. Project health, where each phase stands, all scheduled back from the press date. Weekly for stand-ups, quarterly for leadership."
+      },
+      {
+        "id": "1.5",
+        "title": "Milestones",
+        "shot": "Milestones List modal with dates",
+        "say": "These are the non-negotiable dates. They came from the project template, so Cal never types them twice."
+      },
+      {
+        "id": "1.7",
+        "title": "The timeline",
+        "shot": "Timeline (Gantt) tab with the Today line",
+        "say": "And the view project managers love. Every task across the year, color coded, with a red line for today. You can see exactly where October gets crowded."
+      },
+      {
+        "id": "1.8",
+        "title": "Team capacity",
+        "shot": "Resources tab allocation grid",
+        "say": "Before Cal hands out more work, he checks who actually has room. Every person, every month, one grid."
+      },
+      {
+        "id": "1.9",
+        "title": "Work in flight",
+        "shot": "Tasks tab filtered to In Progress",
+        "say": "Three things in flight. No status update emails. He opens the console and sees it."
+      },
+      {
+        "id": "2.2",
+        "title": "Reassign in one click",
+        "shot": "Task with Assigned To changed + saved",
+        "say": "Vanessa's Lakeshore Trail shoot ran long. One change, and Vince has the lodge shoot."
+      },
+      {
+        "id": "2.3",
+        "title": "Adjust the schedule",
+        "shot": "Task end date moved + Summary updated",
+        "say": "The shoot needs a few more days. Cal moves the date, and the phase table updates on its own."
+      },
+      {
+        "id": "2.4",
+        "title": "Approve for print",
+        "shot": "Approval History showing the approval",
+        "say": "Vince submitted his feature for review. This is a real approval workflow, with a history of who did what and when. And you could add a second step for the CCMO before anything goes to print."
+      },
+      {
+        "id": "2.5",
+        "title": "Bulk updates",
+        "shot": "Two tasks selected, Change Status",
+        "say": "Two tasks updated in five seconds."
+      },
+      {
+        "id": "2.6",
+        "title": "Talk where the work lives",
+        "shot": "Chatter reply on the project",
+        "say": "And the conversation lives on the project. Not in an email thread new people can't find."
+      },
+      {
+        "id": "1.12",
+        "title": "the CMO's view",
+        "shot": "Project Portfolio dashboard",
+        "say": "Now zoom out to the CMO's view. Every project, its health, who's carrying the load, all rolled up in one place."
+      },
+      {
+        "id": "1.13",
+        "title": "What's possible",
+        "shot": "Command Center",
+        "say": "And this is what's possible beyond the free app. A custom command center, built on the same platform and the same data."
+      },
+      {
+        "id": "_close",
+        "title": "Crawl, walk, run",
+        "card": "Start with three sales seats · PMT is free · grow on one platform",
+        "say": "So, useful, easy to operate, easy to integrate, easy to adopt. Start with three sales seats, add project management when you're ready. Crawl, walk, run."
+      }
+    ],
+    "live": {
+      "1.1": [
+        "navigate: {ORG}/lightning/o/Opportunity/list",
+        "click: \"Harbor City Tourism - Lakeshore Trail Content Series\"",
+        "wait: 3"
+      ],
+      "1.2": [
+        "wait: 6"
+      ],
+      "1.3": [
+        "click: \"the PMT Project link on the opportunity\"",
+        "wait: 3",
+        "click: \"Revenue tab\"",
+        "wait: 3"
+      ],
+      "1.4": [
+        "click: \"Summary tab\"",
+        "wait: 2",
+        "click: \"Month toggle\"",
+        "wait: 2"
+      ],
+      "1.5": [
+        "click: \"Milestones List button\"",
+        "wait: 3",
+        "click: \"Close\""
+      ],
+      "1.7": [
+        "click: \"Timeline tab\"",
+        "wait: 4"
+      ],
+      "1.8": [
+        "click: \"Resources tab\"",
+        "wait: 3"
+      ],
+      "1.9": [
+        "click: \"Tasks tab\"",
+        "wait: 2",
+        "click: \"filter tasks to In Progress\"",
+        "wait: 3"
+      ],
+      "2.2": [
+        "click: \"row action menu for Shoot state park lodge interiors\"",
+        "click: \"View\"",
+        "wait: 2",
+        "click: \"edit Assigned To\"",
+        "type: \"Assigned To lookup\" | Vince West",
+        "click: \"Vince West option\"",
+        "click: \"Save\"",
+        "wait: 2"
+      ],
+      "2.3": [
+        "click: \"row action menu for Shoot Lakeshore Trail landmarks\"",
+        "click: \"View\"",
+        "wait: 2",
+        "click: \"edit End Date\"",
+        "type: \"End Date field\" | 10/3/2026",
+        "click: \"Save\"",
+        "wait: 2"
+      ],
+      "2.4": [
+        "click: \"row action menu for Draft: North Shore feature\"",
+        "click: \"View\"",
+        "wait: 2",
+        "click: \"Approval History\"",
+        "wait: 2",
+        "click: \"Approve\"",
+        "click: \"Approve button in the dialog\"",
+        "wait: 2"
+      ],
+      "2.5": [
+        "click: \"Tasks tab\"",
+        "click: \"checkbox on the first task row\"",
+        "click: \"checkbox on the second task row\"",
+        "click: \"Change Status\"",
+        "wait: 2"
+      ],
+      "2.6": [
+        "click: \"Chatter & Activity tab\"",
+        "click: \"Reply on the latest post\"",
+        "type: \"reply box\" | Reminder: press-ready files are due this week.",
+        "click: \"Comment\"",
+        "wait: 2"
+      ],
+      "1.12": [
+        "navigate: {ORG}/lightning/o/Dashboard/home",
+        "click: \"Project Portfolio\"",
+        "wait: 5"
+      ],
+      "1.13": [
+        "click: \"Command Center tab\"",
+        "wait: 4"
+      ]
+    },
+    "slides": {
+      "_intro": {
+        "layout": "value-overview",
+        "title": "Built Around the CMO's Four Criteria",
+        "bullets": [
+          "**Useful:** helps the team get work done",
+          "**Easy to operate:** no PhD required",
+          "**Easy to integrate:** M365 stays, Salesforce connects",
+          "**Easy to adopt:** start small, grow in steps"
+        ]
+      },
+      "_close": {
+        "layout": "wrap",
+        "title": "Start With Three Seats, Grow on One Platform",
+        "bullets": [
+          "PMT is free on the AppExchange",
+          "Revenue, projects and people in one place",
+          "Crawl, walk, run"
+        ]
+      }
+    }
+  }
+}

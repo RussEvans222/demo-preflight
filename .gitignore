@@ -1,0 +1,14 @@
+# Keep customer data out of the repo
+private/
+*-report.json
+*-report.html
+*-fixpack*.html
+*-agent-handoff.zip
+*-demo-recorder.zip
+*-video-kit.html
+screenshots/
+.DS_Store
+# built pages (except the bundled example)
+*-preflight.html
+!examples/**/*-preflight.html
+*.skill

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Preflight</title>
+<style>
+  :root{--primary:#0b2545;--ink:#1a1f27;--sub:#5a6472;--line:#e2e5ea;--bg:#f2f3f5;--card:#fff;
+    --green:#1a7f37;--green-bg:#e6f4ea;--red:#b42318;--red-bg:#fde8e6;--amber-bg:#fff3d6;
+    --tw1:#03346E;--tw2:#6b3fa0;--tw3:#0b6e99;--tw4:#0f7a5a;--tw5:#b5570a;}
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:15px;line-height:1.45}
+  .layout{display:flex;min-height:100vh}
+  nav.side{width:240px;flex:0 0 240px;background:var(--primary);color:#fff;position:sticky;top:0;height:100vh;overflow-y:auto;padding:16px 0 40px}
+  nav.side .brand{padding:0 16px 12px;border-bottom:1px solid rgba(255,255,255,.18);margin-bottom:8px}
+  nav.side .brand strong{display:block;font-size:15px} nav.side .brand span{display:block;font-size:11.5px;opacity:.75;margin-top:2px}
+  nav.side .prog{padding:4px 16px 10px;font-size:12px}
+  nav.side .bar{height:7px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden;margin-top:5px}
+  nav.side .bar i{display:block;height:100%;background:#7fd39a;width:0}
+  nav.side .sec-label{padding:12px 16px 4px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.6}
+  nav.side a{display:flex;gap:8px;align-items:center;color:#e8edf5;text-decoration:none;font-size:12.8px;padding:5px 16px}
+  nav.side a:hover{background:rgba(255,255,255,.08)}
+  nav.side a .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);flex:0 0 9px}
+  nav.side a .dot.pass{background:#7fd39a} nav.side a .dot.fail{background:#ff8a80} nav.side a .dot.skip{background:#b9c0ca}
+  nav.side .tools{padding:14px 16px;display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.18);margin-top:10px}
+  .hbtn{background:#fff;color:var(--primary);border:0;border-radius:6px;padding:6px 10px;font-size:12.5px;cursor:pointer;font-weight:600;text-align:center}
+  nav.side label.tr{font-size:12px} nav.side input[type=text]{width:100%;border:0;border-radius:6px;padding:6px 8px;font-size:13px;margin-top:4px}
+  main{flex:1;min-width:0;padding:22px 30px 80px;max-width:960px}
+  h1{font-size:23px;margin:0 0 4px;color:var(--primary)} .subtitle{color:var(--sub);font-size:13.5px;margin-bottom:18px}
+  .intro{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:18px}
+  .intro h2{margin:0 0 8px;font-size:16px;color:var(--primary)} .intro ol{margin:6px 0 0;padding-left:20px}
+  .warn{background:var(--amber-bg);border:1px dashed #e0b453;border-radius:8px;padding:10px 14px;font-size:13.5px;margin-top:10px}
+  .warn.info{background:#eef3fb;border-color:#9db8dd}
+  .phase{margin:26px 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:10px;scroll-margin-top:14px}
+  .phase b{color:var(--primary)}
+  .tag{font-size:11px;border-radius:10px;padding:2px 8px;text-transform:none;letter-spacing:0}
+  .tag.safe{background:var(--green-bg);color:var(--green)} .tag.change{background:var(--red-bg);color:var(--red)}
+  .step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:12px;border-left:5px solid var(--line);scroll-margin-top:14px}
+  .step.pass{border-left-color:var(--green)} .step.fail{border-left-color:var(--red)} .step.skip{border-left-color:#b9c0ca;opacity:.75}
+  .step h3{margin:0 0 6px;font-size:15.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .step h3 .id{color:#1492D6;font-size:12.5px;font-weight:700;min-width:30px}
+  .scene-link{font-size:11.5px;font-weight:600;background:#eef3fb;color:var(--primary);border-radius:6px;padding:2px 8px;text-decoration:none}
+  .tw{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;color:#fff;font-size:10px;font-weight:700}
+  .tw1{background:var(--tw1)}.tw2{background:var(--tw2)}.tw3{background:var(--tw3)}.tw4{background:var(--tw4)}.tw5{background:var(--tw5)}
+  .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
+  .lbl.c{color:var(--primary)} .lbl.e{color:var(--green)} .lbl.f{color:var(--red)}
+  .step ul{margin:3px 0 0;padding-left:20px} .step li{margin-bottom:2px}
+  .fixbox{background:#fafbfc;border-radius:8px;padding:6px 10px;font-size:13.5px;color:#4a3a2a;margin-top:3px}
+  .acts{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .acts button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600}
+  .acts button.p.on{background:var(--green);color:#fff;border-color:var(--green)}
+  .acts button.f.on{background:var(--red);color:#fff;border-color:var(--red)}
+  .acts button.s.on{background:#8b95a3;color:#fff;border-color:#8b95a3}
+  .acts input{flex:1;min-width:200px;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:13px}
+  code{background:#eef0f3;border-radius:4px;padding:1px 6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  .cp{border:1px solid #c7d3e3;background:#f4f8fd;border-radius:5px;font-size:11px;padding:1px 7px;cursor:pointer;margin-left:4px}
+  #summary{background:#fff;border:2px solid var(--primary);border-radius:12px;padding:16px 20px;margin-top:26px;scroll-margin-top:14px}
+  #summary h2{margin:0 0 8px;font-size:16px;color:var(--primary)}
+  #summary pre{white-space:pre-wrap;background:#0d1b2e;color:#e8edf5;border-radius:8px;padding:12px;font-size:12.5px;min-height:40px}
+  .gstep{margin:8px 0 12px} .gstep .gh{font-weight:600;color:var(--ink);font-size:13px;margin-bottom:4px} .gstep .gh a{color:var(--primary);text-decoration:none}
+  .st{display:inline-block;font-size:11px;font-weight:700;border-radius:8px;padding:1px 7px;margin-left:6px} .st.pass{background:var(--green-bg);color:var(--green)} .st.fail{background:var(--red-bg);color:var(--red)} .st.skip,.st.unchecked{background:#eceef1;color:#5a6472}
+  #summary button{background:var(--primary);color:#fff;border:0;border-radius:7px;padding:7px 14px;font-size:13px;cursor:pointer}
+  #toast{position:fixed;right:22px;bottom:22px;background:#1a7f37;color:#fff;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:20}
+  #toast.show{opacity:1;transform:none} #toast.err{background:var(--red)}
+  .ql{display:block;background:rgba(255,255,255,.12);color:#fff!important;border-radius:6px;padding:5px 9px!important;margin-top:4px;font-size:12.5px!important;text-decoration:none}
+  .ql:hover{background:rgba(255,255,255,.22)}
+  .golink{font-size:11.5px;font-weight:600;background:#e6f4ea;color:#1a7f37;border-radius:6px;padding:2px 8px;text-decoration:none}
+  .shots{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .shot{position:relative;border:1px solid var(--line);border-radius:6px;overflow:hidden;width:120px;height:80px;background:#f6f7f9;cursor:zoom-in}
+  .shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .shot b{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border-radius:4px;font-size:11px;padding:0 5px;cursor:pointer}
+  .step.active{box-shadow:0 0 0 2px #9db8dd}
+  .step.drag{box-shadow:0 0 0 3px #1a7f37}
+  .fixreq textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:13px/1.4 -apple-system,Segoe UI,sans-serif;margin-top:3px;background:#fffaf7}
+  .aibox{background:#f2f6ef;border:1px solid #d5e3cf;border-left:3px solid var(--green);border-radius:6px;padding:8px 12px;margin-top:8px;font-size:13.5px}
+  .aibox .lbl{margin-top:2px}
+  .addimg{font-size:12.5px;color:var(--sub);cursor:pointer;border:1px dashed #c7d3e3;border-radius:7px;padding:5px 10px;background:#fafbfc}
+  #lb{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:30;cursor:zoom-out}
+  #lb img{max-width:94vw;max-height:92vh;border-radius:6px}
+  footer.doc{text-align:center;color:var(--sub);font-size:12px;padding:24px 0}
+</style>
+<style id="claude-theme">
+  :root{--primary:#c96442;--clay:#d97757;--ink:#141413;--sub:#6b6a65;--line:#e8e6dc;--bg:#faf9f5;--card:#ffffff;
+    --green:#4a7c59;--green-bg:#eaf1e7;--red:#b5452f;--red-bg:#f8e6df;--amber-bg:#f6eedb;--term:#1f1e1d;--term2:#2a2927;--cream:#e8e6dc;
+    --serif:"Copernicus","Tiempos Headline","Iowan Old Style","Palatino Linotype",Georgia,serif;
+    --mono:"Berkeley Mono","JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+  body{background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  nav.side{background:var(--term);color:var(--cream);font-family:var(--mono);border-right:1px solid #000}
+  nav.side .brand{border-bottom:1px solid #3a3936}
+  nav.side .brand strong{font-family:var(--mono);font-size:13.5px;color:#fff}
+  nav.side .brand strong:before{content:"✻ ";color:var(--clay)}
+  nav.side .brand span{font-size:11px;color:#9b9a94;opacity:1}
+  nav.side .prog{font-size:11px;color:#9b9a94}
+  nav.side .bar{background:#3a3936;height:5px}
+  nav.side .bar i{background:var(--clay)}
+  nav.side .sec-label{color:var(--clay);opacity:1;font-size:10px;letter-spacing:.08em}
+  nav.side .sec-label:before{content:"› "}
+  nav.side a{font-size:12px;color:#cfcdc4;font-family:var(--mono);padding:4px 16px}
+  nav.side a:hover{background:var(--term2);color:#fff}
+  nav.side a .dot{width:8px;height:8px;border-radius:2px;background:#4a4945}
+  nav.side a .dot.pass{background:#7fb38a} nav.side a .dot.fail{background:var(--clay)} nav.side a .dot.skip{background:#8a8983}
+  nav.side .tools{border-top:1px solid #3a3936}
+  nav.side label.tr{font-size:11px;color:#9b9a94}
+  nav.side input[type=text]{background:var(--term2);color:#fff;border:1px solid #3a3936;font-family:var(--mono);font-size:12px;border-radius:6px}
+  nav.side input[type=text]:focus{outline:none;border-color:var(--clay)}
+  .hbtn{background:transparent;color:var(--cream);border:1px solid #4a4945;font-family:var(--mono);font-size:11.5px;font-weight:500;border-radius:6px}
+  .hbtn:hover{border-color:var(--clay);color:#fff}
+  .ql{background:var(--term2)!important;border:1px solid #3a3936;color:var(--cream)!important;font-family:var(--mono);font-size:11.5px!important}
+  .ql:hover{border-color:var(--clay)}
+  main{padding:34px 44px 90px;max-width:900px}
+  h1{font-family:var(--serif);font-weight:500;font-size:30px;letter-spacing:-.01em;color:var(--ink)}
+  .subtitle{font-size:13px;color:var(--sub)} .subtitle code{display:none}
+  .intro{background:transparent;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;padding:18px 0}
+  .intro h2,#summary h2,#summary h3{font-family:var(--serif)!important;font-weight:500;font-size:19px;color:var(--ink)!important}
+  .warn{background:var(--amber-bg);border:1px solid #e9dcb8;border-left:3px solid var(--clay);border-radius:6px}
+  .warn.info{background:#f2f0e8;border-color:var(--line);border-left-color:#8a8983}
+  .phase{font-family:var(--mono);font-size:12px;text-transform:none;letter-spacing:0;color:var(--sub);margin-top:34px}
+  .phase b{color:var(--ink);font-weight:600} .phase b:before{content:"## ";color:var(--clay)}
+  .tag{font-family:var(--mono);font-size:10.5px;border-radius:4px}
+  .step{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:8px;box-shadow:0 1px 0 rgba(20,20,19,.03)}
+  .step h3{font-family:var(--serif);font-weight:500;font-size:17px}
+  .step h3 .id{font-family:var(--mono);color:var(--clay);font-size:12px;font-weight:600}
+  .step.active{box-shadow:0 0 0 2px rgba(217,119,87,.35)}
+  .step.drag{box-shadow:0 0 0 3px var(--clay)}
+  .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;font-weight:600}
+  .lbl.c{color:var(--sub)} .lbl:before{content:"// "}
+  .fixbox{background:#f5f4ee;color:#4b4a45;border-radius:6px}
+  .acts button{font-family:var(--mono);font-size:12px;font-weight:500;border-radius:6px;background:#fff;color:var(--ink)}
+  .acts input{border-radius:6px;font-size:13px;background:#fdfcfa}
+  .acts input:focus{outline:none;border-color:var(--clay);box-shadow:0 0 0 3px rgba(217,119,87,.15)}
+  .addimg{font-family:var(--mono);font-size:11.5px;border-color:#d8d5c8;background:#fdfcfa}
+  .addimg:hover{border-color:var(--clay);color:var(--ink)}
+  code{background:#f0eee6;font-family:var(--mono);font-size:12.5px}
+  .golink{background:#f6e7e0;color:var(--primary);font-family:var(--mono);font-size:11px;border-radius:4px}
+  #summary{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--clay);border-radius:8px}
+  #summary pre{background:var(--term);color:var(--cream);font-family:var(--mono);font-size:12px}
+  #summary button{background:var(--ink);font-family:var(--mono);font-size:12px;border-radius:6px}
+  #summary button:hover{background:var(--primary)}
+  .gstep .gh a{color:var(--primary)!important}
+  .st{font-family:var(--mono);border-radius:4px}
+  #toast{background:var(--term);color:var(--cream);font-family:var(--mono);font-size:12px;border:1px solid #3a3936}
+  #toast.err{background:var(--red);color:#fff}
+  footer.doc{font-family:var(--mono);font-size:11px}
+  ::selection{background:rgba(217,119,87,.25)}
+</style>
+<style id="sf-flare">
+  :root{--sfblue:#0176d3;--afblue:#0D3DFF;--sky2:#e8f1fd}
+  .hero{position:relative;overflow:hidden;border-radius:14px;padding:22px 26px 20px;margin:0 0 18px;color:#fff;
+    background:radial-gradient(1200px 300px at 110% -40%,rgba(217,119,87,.55),transparent 60%),linear-gradient(120deg,#032d60 0%,#0b5cab 45%,#0D3DFF 100%)}
+  .hero h1{color:#fff!important;margin:0 0 4px;font-size:30px}
+  .hero .kick{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+  .hero .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .hero .pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:3px 11px;font-size:12px;font-family:var(--mono)}
+  .hero svg.cloud{position:absolute;right:-18px;bottom:-26px;width:230px;opacity:.16}
+  .spark{position:absolute;color:#fff;animation:tw 2.6s ease-in-out infinite;pointer-events:none}
+  .spark:nth-of-type(2){animation-delay:.8s}.spark:nth-of-type(3){animation-delay:1.6s}
+  @keyframes tw{0%,100%{opacity:.15;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(20deg)}}
+  .rec{margin-top:10px;border:1px dashed #9db5f5;background:linear-gradient(90deg,#eef3ff,#fff 70%);border-radius:8px;padding:8px 12px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+  .rec .ic{font-size:16px;line-height:1}
+  .rec b{color:var(--afblue)} .rec .say{color:#4b4a45;font-style:italic;margin-top:2px}
+  .rec.got{border-style:solid;border-color:#9fd3b1;background:linear-gradient(90deg,#eaf6ee,#fff 70%)}
+  .rec.got b{color:var(--green)}
+  .vidbar{margin:14px 16px 4px;padding:10px 12px;border:1px solid #3a3936;border-radius:8px;background:linear-gradient(135deg,#0b2a6b,#1f1e1d)}
+  .vidbar .t{font-size:11px;color:#9fb6ff;letter-spacing:.06em;text-transform:uppercase}
+  .vidbar .n{font-size:18px;color:#fff;font-weight:600;margin:2px 0 6px}
+  .vidbar .bar{height:5px;background:#3a3936;border-radius:3px;overflow:hidden}.vidbar .bar i{display:block;height:100%;background:linear-gradient(90deg,#0D3DFF,#d97757);width:0}
+  .hbtn.sf{border-color:#5a7cff!important;color:#fff!important;background:rgba(13,61,255,.18)!important}
+  body.recmode .step:not([data-rec]){opacity:.45}
+  body.recmode .rec{box-shadow:0 0 0 2px rgba(13,61,255,.25)}
+</style>
+<style id="cc-light">
+  /* Claude Code light: paper canvas, ink text, clay accent, mono labels. Overrides every earlier theme layer. */
+  :root{--primary:#c96442;--clay:#d97757;--ink:#141413;--sub:#6b6a65;--line:#e8e6dc;--bg:#faf9f5;--card:#ffffff;--soft:#f5f4ee;
+    --green:#4a7c59;--green-bg:#eaf1e7;--red:#b5452f;--red-bg:#f8e6df;--amber-bg:#f6eedb}
+  body{background:var(--bg)!important;color:var(--ink)}
+  nav.side{background:var(--soft)!important;color:var(--ink)!important;border-right:1px solid var(--line)!important}
+  nav.side .brand{border-bottom:1px solid var(--line)!important}
+  nav.side .brand strong{color:var(--ink)!important} nav.side .brand span,nav.side .prog,nav.side label.tr{color:var(--sub)!important}
+  nav.side .bar,.vidbar .bar{background:#e3e0d3!important} nav.side .bar i{background:var(--clay)!important}
+  nav.side .sec-label{color:var(--clay)!important}
+  nav.side a{color:#3d3d3a!important} nav.side a:hover{background:#ece9df!important;color:var(--ink)!important}
+  nav.side a .dot{background:#d8d5c8!important} nav.side a .dot.pass{background:var(--green)!important} nav.side a .dot.fail{background:var(--clay)!important}
+  nav.side .tools{border-top:1px solid var(--line)!important}
+  nav.side input[type=text]{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+  .hbtn,.hbtn.sf{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important;font-weight:500}
+  .hbtn:hover,.hbtn.sf:hover{border-color:var(--clay)!important;color:var(--primary)!important}
+  .hbtn.primary{background:var(--ink)!important;color:#fff!important;border-color:var(--ink)!important}
+  .hbtn.primary:hover{background:var(--primary)!important;border-color:var(--primary)!important;color:#fff!important}
+  .ql{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+  .vidbar{background:#fff!important;border:1px solid var(--line)!important}
+  .vidbar .t{color:var(--sub)!important} .vidbar .n{color:var(--ink)!important} .vidbar .bar i{background:var(--clay)!important}
+  .hero{background:transparent!important;color:var(--ink)!important;padding:4px 0 18px!important;border-radius:0!important;border-bottom:1px solid var(--line);overflow:visible}
+  .hero h1{color:var(--ink)!important;font-family:var(--serif);font-weight:500;font-size:32px}
+  .hero .kick{color:var(--clay)!important;opacity:1}
+  .hero div[style]{color:var(--sub)}
+  .hero .pill{background:var(--soft)!important;border:1px solid var(--line)!important;color:#3d3d3a}
+  .hero svg.cloud,.hero .spark{display:none}
+  .rec{background:#fff!important;border:1px solid var(--line)!important;border-left:3px solid var(--clay)!important}
+  .rec b{color:var(--primary)!important} .rec.got{border-left-color:var(--green)!important} .rec.got b{color:var(--green)!important}
+  body.recmode .rec{box-shadow:0 0 0 2px rgba(217,119,87,.25)!important}
+  #summary pre{background:var(--soft)!important;color:var(--ink)!important;border:1px solid var(--line)}
+  #summary button,#summary label{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important;font-family:var(--mono)}
+  #summary button:hover,#summary label:hover{border-color:var(--clay)!important;color:var(--primary)!important}
+  #summary button.primary{background:var(--ink)!important;color:#fff!important}
+  #toast{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:0 6px 20px rgba(20,20,19,.08)!important}
+  #toast.err{background:var(--red-bg)!important;color:var(--red)!important}
+  #aim>div{background:#fff!important;border:1px solid var(--line)}
+  #aiPrompt{background:var(--soft)!important;color:var(--ink)!important}
+  .golink{background:var(--soft)!important;color:var(--primary)!important;border:1px solid var(--line)}
+  .aibox{background:#fff!important;border:1px solid var(--line)!important;border-left:3px solid var(--green)!important}
+  #movie>div{background:#fff;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side">
+  <div class="brand"><strong id="brandName"></strong><span id="brandSub"></span></div>
+  <div class="prog"><span id="count">0 / 0 checked</span> · <span id="savedAt">not saved yet</span><div class="bar"><i id="barfill"></i></div></div>
+  <div class="vidbar"><div class="t">🎬 Demo video shots</div><div class="n" id="vidN">0 / 0</div><div class="bar"><i id="vidFill"></i></div></div>
+  <div id="navlist"></div>
+  <a href="#summary"><span class="dot"></span>Results summary</a>
+  <div class="tools" id="orgbox">
+    <label class="tr">Demo org URL<input type="text" id="orgUrl" placeholder="https://yourdemo.lightning.force.com"></label>
+    <div id="reclinks"></div>
+    <div id="quick"></div>
+  </div>
+  <div class="tools">
+    <label class="tr"><span id="testLbl">Test record</span><input type="text" id="t1" placeholder="record # / name"></label>
+    <button class="hbtn" onclick="exportNotes()" title="Downloads a JSON report with every step, expected result, If-not hint, your result and notes. Upload it to the builder's coding agent as context.">Download report (JSON)</button>
+    <button class="hbtn primary" onclick="makeMovie()">🎬 Make the movie</button>
+    <button class="hbtn" onclick="exportVideoKit()">▶ Preview narrated slideshow</button>
+    <button class="hbtn" onclick="toggleRec()" id="recBtn">📸 Recording mode: off</button>
+    <button class="hbtn" onclick="aiSuggest()" style="border-color:var(--clay);color:#fff">✨ Suggest fixes (AI)</button>
+    <button class="hbtn" onclick="exportMeshZip()" title="fix-brief.md + PNG screenshots + JSON: for agents that don't read HTML (Mesh)">📦 Agent hand-off (.md + PNGs)</button>
+    <button class="hbtn" onclick="exportHtml()">Download fix pack (HTML + images)</button>
+    <label class="hbtn"><input type="file" accept=".json,.html" style="display:none" onchange="importNotes(this)">⬆ Import report / fix pack</label>
+    <button class="hbtn" onclick="resetAll()">Clear results</button>
+  </div>
+</nav>
+<main>
+  <div class="hero"><div class="kick">✻ demo preflight · test · fix · record</div>
+  <h1 id="heroTitle"></h1>
+  <div id="heroSub" style="font-size:14px"></div>
+  <div class="pills"><span class="pill">✓ test every click</span><span class="pill">📸 capture video shots</span><span class="pill">✨ AI fix suggestions</span><span class="pill">🎬 one-click movie</span></div>
+</div>
+  <div class="subtitle">Built from <span class="src"></span></div>
+  <div class="intro">
+    <h2>How to use this</h2>
+    <ol>
+      <li>Keep this open beside the demo environment. Work through the steps in order, clicking exactly what each step says.</li>
+      <li>Compare the screen to <b>You should see</b>, then mark <b>Pass</b>, <b>Fail</b> or <b>Skip</b> and add a note. <b>Everything autosaves</b> in this browser, and a "Saved" message confirms each change.</li>
+      <li><b>Download report (JSON)</b> saves every step with its expected result, If-not hint, your result and notes. Send it to <span class="bld"></span>, or upload it to a coding agent as context. It also works as a backup: <b>Load report</b> restores it on any machine.</li>
+      <li><b>📸 Video shots:</b> steps with a blue <b>Capture for the demo video</b> callout are scenes in the recorded demo. Paste a clean screenshot there (no notes or popups showing). <b>Recording mode</b> fades out every other step. When the meter is full, click <b>🎬 Make the movie</b>. It downloads a bundle that Vaibhav's <i>autonomous-demo-recorder</i> turns into a narrated MP4: unzip it and double-click <code>make-movie.command</code>. <b>▶ Preview</b> plays a quick narrated slideshow in the browser first.</li>
+      <li><b>Screenshots:</b> click a step (or its notes box), then press <b>⌘V</b> to paste a screenshot. You can also drag an image onto a step, or use <b>Add image</b>. Images are shrunk, saved with your notes, and included in the JSON report.</li>
+      <li>When you're done, copy the summary at the bottom and send it to <span class="bld"></span>.</li>
+    </ol>
+    <div class="warn"><b><span class="gold"></span> is the demo record. Don't change it.</b> Phase 1 only <i>looks</i> at it. Every step that changes data runs in demo order on a <b>spare test record</b>. Whatever works there will work on demo day, and the demo record stays clean.</div>
+    <div id="extraNotes"></div>
+  </div>
+  <div id="steps"></div>
+  <div id="summary">
+    <h2>Results summary</h2>
+    <p style="font-size:13.5px;color:var(--sub);margin-top:0">Updates as you go. Copy it and send it to <span class="bld"></span>.</p>
+    <pre id="sumtext">Nothing marked yet.</pre>
+    <button onclick="exportMeshZip()">📦 Agent hand-off</button> <button class="primary" onclick="makeMovie()">🎬 Make the movie</button> <button onclick="exportVideoKit()">▶ Preview</button> <button onclick="aiSuggest()">✨ Suggest fixes (AI)</button> <label style="background:#141413;color:#fff;border-radius:6px;padding:7px 14px;font:12px var(--mono);cursor:pointer;display:inline-block"><input type="file" accept=".json,.html" style="display:none" onchange="importNotes(this)">⬆ Import report</label> <button onclick="copySummary(this)">Copy summary</button> <button onclick="exportHtml()">Download fix pack (HTML + images)</button>
+    <h3 style="font-size:14px;margin:18px 0 6px;color:var(--primary)">Screenshots so far</h3>
+    <div id="gallery" style="font-size:13px;color:var(--sub)">None yet. Paste one into any step.</div>
+  </div>
+  <footer class="doc">Generated by <b>demo-preflight</b> from <span class="src"></span>. Expected values come from the script. If the org disagrees, the org is the source of truth, so note it and tell <span class="bld"></span>.</footer>
+</main>
+</div>
+<div id="toast">Saved ✓</div>
+<div id="movie" style="display:none;position:fixed;inset:0;background:rgba(20,20,19,.35);z-index:45;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+ <div style="max-width:620px;width:92vw;border-radius:10px;padding:22px 24px">
+  <div style="font:11px var(--mono);color:var(--clay);letter-spacing:.06em;text-transform:uppercase">✻ autonomous-demo-recorder</div>
+  <h2 style="font-family:var(--serif);font-weight:500;margin:4px 0 10px;font-size:22px">Your movie bundle is downloading</h2>
+  <ol style="margin:0 0 12px;padding-left:20px;font-size:14px;line-height:1.7">
+   <li>Unzip <code id="mvZip">bundle.zip</code>.</li>
+   <li>Double-click <b><code>make-movie.command</code></b>. If macOS blocks it: right-click → Open, or run <code>bash make-movie.command</code> in Terminal.</li>
+   <li>It finds the recorder, installs anything missing, renders <code id="mvOut">~/Desktop/…mp4</code> and opens it.</li>
+  </ol>
+  <div style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:12.5px var(--mono)">Live version (drives the org): <code>bash make-movie.command live</code><br><span style="color:var(--sub)">Needs a logged-in org and an Anthropic or gateway key for --smart.</span></div>
+  <div id="mvWarn" style="margin-top:10px;font-size:13px;color:var(--red)"></div>
+  <div style="margin-top:14px;text-align:right"><button class="hbtn" onclick="document.getElementById('movie').style.display='none'">Got it</button></div>
+ </div></div>
+<div id="aim" style="display:none;position:fixed;inset:0;background:rgba(20,20,19,.55);z-index:40;align-items:center;justify-content:center">
+ <div style="background:#faf9f5;max-width:760px;width:92vw;max-height:88vh;overflow:auto;border-radius:10px;padding:20px 22px;border-top:3px solid #d97757">
+  <h2 style="font-family:Georgia,serif;font-weight:500;margin:0 0 6px">✨ Suggest fixes with AI</h2>
+  <p style="font-size:13.5px;color:#6b6a65;margin:0 0 10px">No AI is connected to this page. <b>1.</b> Copy the prompt and paste it into Claude (or Mesh, or Claude Code in VS Code), along with your screenshots if you want. <b>2.</b> Paste the JSON it sends back below and click <b>Import</b>. The suggestions attach to each step and go into the fix pack.</p>
+  <textarea id="aiPrompt" readonly style="width:100%;height:180px;font:12px ui-monospace,Menlo,monospace;border:1px solid #e8e6dc;border-radius:6px;padding:8px;background:#1f1e1d;color:#e8e6dc"></textarea>
+  <div style="margin:6px 0 14px"><button class="cp" onclick="cp(document.getElementById('aiPrompt').value,this)">Copy prompt</button></div>
+  <textarea id="aiBack" placeholder='Paste the AI response (JSON array) here' style="width:100%;height:120px;font:12px ui-monospace,Menlo,monospace;border:1px solid #e8e6dc;border-radius:6px;padding:8px"></textarea>
+  <div style="margin-top:10px;display:flex;gap:8px"><button class="hbtn" style="background:#141413;color:#fff;border:0" onclick="aiImport()">Import suggestions</button><button class="hbtn" style="color:#141413;border:1px solid #ccc" onclick="document.getElementById('aim').style.display='none'">Close</button></div>
+ </div></div>
+<div id="lb" onclick="this.style.display='none'"><img id="lbimg" alt=""></div>
+<script>
+const CFG = {"name": "Lakeshore Tourism · Project Management Demo", "slug": "lakeshore-pm", "storage_key": "preflight-lakeshore-pm-v1", "date": "Sample demo", "tagline": "PMT Console · Cal Rogers' Tuesday morning", "sources": "examples/lakeshore-pm/demo-script.md", "builder": "the demo builder (Mesh, Claude Code, or a teammate)", "golden_record": "2026 Annual Travel Guide (PMT project)", "test_record_label": "Test project (spare)", "cheatsheet": "", "persona": "Cal Rogers, Content Operations Manager", "presenter": "", "presenter_title": "", "record_links": [{"key": "guide", "label": "Travel Guide project"}, {"key": "tulsa", "label": "Harbor City Tourism opp"}], "extra_notes": [{"kind": "info", "title": "This is the bundled sample.", "html": "Copy <code>examples/lakeshore-pm/demo.json<\/code>, swap in your own steps, then run <code>python3 scripts/build.py your-demo.json<\/code>."}], "reset": ["Shoot Lakeshore Trail landmarks: End Date back to 9/28", "Shoot state park lodge interiors: Assigned To back to Vanessa Central", "Draft: North Shore feature: Sign-off back to Submitted"], "agent_rules": ["PMT is a managed package (Salesforce Labs). Configure around it; don't edit its metadata."], "phases": [{"name": "Phase 0 · Setup", "tag": "safe", "steps": [{"id": "0.1", "go": "home", "t": "Sign in and open the PMT Console", "c": ["Sign in to the VisitLakeshore demo org", "App Launcher → <b>PMT Console<\/b> (not standard PMT)"], "e": ["Console app opens with workspace tabs", "You're logged in as the user whose name should show as <b>Cal Rogers<\/b> on the dashboard"], "f": "If only standard PMT shows, the console app isn't assigned to your profile. Assign the app, or use standard PMT and expect clunkier tab navigation."}, {"id": "0.2", "t": "Deck check: title date + slide order", "c": ["Open the <b>Travel Lakeshore – Project Management<\/b> deck (the 9-slide version)", "Check the title slide, then flip through to 'From Challenge to Solved'"], "e": ["The title slide date reads <b>October 9, 2026<\/b>. It currently says September 25.", "Order: Who is Salesforce → Public Sector → Current Challenges → <b>Meet Cal Rogers<\/b> → What Cal Is Up Against (Oct 2 press date) → <b>Cal's Journey (5 steps)<\/b>, where the live demo starts → From Challenge to Solved → Thank you"], "f": "The script's slide numbers (5–10) are off by one compared with this 9-slide deck. Go by slide titles, not numbers."}, {"id": "0.3", "go": "dash", "t": "Refresh the Project Portfolio dashboard", "c": ["Dashboards → <b>Project Portfolio<\/b> → Refresh"], "e": ["The <b>As of<\/b> timestamp shows today", "The running user shows <b>Cal Rogers<\/b>"], "f": "If it shows a different user, change the dashboard's running user, or say it's Cal's view and move on."}, {"id": "0.4", "t": "Write down the golden-record baseline (for the reset)", "c": ["Travel Guide → Tasks → use the row-action <b>▼ → View<\/b> on each task below"], "e": ["<b>Shoot Lakeshore Trail landmarks<\/b>: End Date = <b>Sep 28<\/b>", "<b>Shoot state park lodge interiors<\/b>: Assigned To = <b>Vanessa Central<\/b>", "<b>Draft: North Shore feature<\/b>: Sign-off = <b>Submitted<\/b>", "Resources: write down the current allocations, or take a screenshot of them"], "f": "If any value already differs, a previous run wasn't reset. Fix it now using the Data Reset list (step 4.1)."}, {"id": "0.5", "t": "Pick the spare test record", "c": ["Choose a spare PMT project with tasks you can change. Clone the Travel Guide from its template if you can.", "Type its name in the sidebar box"], "e": ["The test project has: an assigned task you can reassign, a task with an End Date, a task with Sign-off = <b>Submitted<\/b> routed to you, and 2+ tasks for the mass status change", "Its Chatter tab has at least one existing thread"], "f": "If there's no spare project and no time to clone one, run Phase 2 on the Travel Guide and do the full Data Reset (4.1) right afterward. Confirm with the builder: is there a test project?"}]}, {"name": "Phase 1 · Read-only checks (golden record)", "tag": "safe", "steps": [{"id": "1.1", "go": "tulsa", "t": "Opportunity: Harbor City Tourism – Lakeshore Trail Content Series", "c": ["Opportunities → <b>Harbor City Tourism - Lakeshore Trail Content Series<\/b>"], "e": ["Amount <b>$65,000<\/b>", "Linked project shows <b>Lakeshore Trail Guide<\/b>"], "f": "If there's no project link, the lookup or related list is missing from the layout. Tell the builder."}, {"id": "1.2", "go": "tulsa", "t": "Murray AI summary renders", "c": ["Stay on the opportunity and wait about 10 seconds"], "e": ["The <b>Murray<\/b> (Agentforce) summary panel renders with deal history and next actions", "Nothing in it is inaccurate or embarrassing"], "f": "If it doesn't render within about 10 seconds, plan to skip it live, as the script says. Note how long it took."}, {"id": "1.3", "go": "guide", "t": "Travel Guide → Revenue tab", "c": ["PMT Console → <b>2026 Annual Travel Guide<\/b> → <b>Revenue<\/b> tab"], "e": ["Budget Goal <b>$150,000<\/b>", "<b>$115,000<\/b> closed-won, <b>77%<\/b> of goal", "<b>$8,500<\/b> in pipeline", "The list shows the opportunities that fund this project"], "f": "If the numbers are off, an opportunity's stage or project link changed. Check the per-project funding table in the script."}, {"id": "1.4", "go": "guide", "t": "Summary tab: health, phases, period toggle", "c": ["Click the <b>Summary<\/b> tab", "Toggle <b>Weekly → Monthly → Quarterly<\/b> (top right)"], "e": ["Health is <b>green / On Track<\/b>", "<b>6 phases<\/b>: Content Planning done, Photography wrapping up, Editorial Writing underway", "The toggle changes the view each time"], "f": "If the phase statuses look stale, roll-ups may not have recalculated. Tell the builder."}, {"id": "1.5", "go": "guide", "t": "Milestone List", "c": ["Summary → <b>Milestone List<\/b> button → read it → close the modal"], "e": ["Editorial freeze <b>Sep 15<\/b>", "Press-ready files <b>Oct 2<\/b>", "Warehouse delivery <b>Dec 30<\/b>"], "f": "Note: on Oct 9, the editorial freeze and press dates are already past. Decide how to phrase it (see the note at the top)."}, {"id": "1.6", "t": "'Created from a template' proof point", "c": ["Find where the project shows it came from a template (field, related record or template object)"], "e": ["Something on screen you can point to when you say this project was created from a template"], "f": "Confirm with the builder: expected ___. If nothing is visible, narrate it without pointing."}, {"id": "1.7", "go": "guide", "t": "Timeline (Gantt) tab", "c": ["Click the <b>Timeline<\/b> tab. <b>Don't drag anything.<\/b>"], "e": ["Bars are grouped by phase. Green = completed, blue = in progress (Lakeshore Trail photo shoot <b>75%<\/b>, North Shore feature), gray = upcoming", "A red <b>Today<\/b> line", "The October crunch is visible (Editorial, Design &amp; Layout, Review all overlap)"], "f": "If the Today line sits after the in-progress bars, the story looks late. Consider shifting the demo dates (see the note at the top)."}, {"id": "1.8", "go": "guide", "t": "Resources tab + Edit Allocations (cancel only)", "c": ["Click the <b>Resources<\/b> tab", "Click <b>Edit Allocations<\/b>, look at the grid, then click <b>Cancel<\/b>"], "e": ["Cal at <b>30%<\/b> as Project Manager", "Vanessa at <b>40%<\/b> in Sep–Oct", "Vince picks up during the editorial crunch", "The grid is editable, and Cancel leaves everything unchanged"], "f": "If the grid doesn't open, check component permissions. Tell the builder."}, {"id": "1.9", "go": "guide", "t": "Tasks tab: In Progress filter + row action", "c": ["Click the <b>Tasks<\/b> tab → filter to <b>In Progress<\/b>", "On one row, click <b>▼ → View<\/b>. Don't click the cell value."], "e": ["<b>3 tasks<\/b>: Vince on the North Shore feature (~halfway), Vanessa on the Lakeshore Trail photo shoot (75%), Valerie on the Lakeshore Trail road trip itinerary", "▼ → View opens the record without starting an inline edit"], "f": "If the count isn't 3, a task's status changed since the build. Reset it, or adjust your talk track."}, {"id": "1.10", "go": "guide", "t": "Approval setup on North Shore draft (look only)", "c": ["Open <b>Draft: North Shore feature<\/b> (▼ → View)", "Find the <b>Approval History<\/b> component"], "e": ["Sign-off = <b>Submitted<\/b>", "Approval History shows it submitted by Vince and pending with <b>Cal<\/b> (you)", "An <b>Approve<\/b> action is available to you"], "f": "If Approve isn't offered, the running user isn't the approver. The fallback is flipping the picklist."}, {"id": "1.11", "go": "guide", "t": "Chatter & Activity + Files tabs", "c": ["Project → <b>Chatter &amp; Activity<\/b> tab", "Then the <b>Files<\/b> tab"], "e": ["At least one existing thread with a <b>Reply<\/b> option (the compose box doesn't render on managed objects, which is expected)", "The Files tab shows project files (brand assets, drafts)"], "f": "If there's no thread to reply to, the builder needs to seed one. If Files is empty, confirm with the builder: expected ___."}, {"id": "1.12", "go": "dash", "t": "Project Portfolio dashboard components", "c": ["Dashboards → <b>Project Portfolio<\/b>"], "e": ["Health donut shows <b>6 projects, all on track<\/b>", "Project Detail, Portfolio Ownership and Resource Assignments components all render", "The completion gauge shows <b>226%<\/b> (a known quirk, so don't dwell on it)"], "f": "If a component errors, refresh. If it still errors, tell the builder which component."}, {"id": "1.13", "t": "Command Center + funding numbers", "c": ["Open the <b>Command Center<\/b> tab", "Spot-check 2 projects' Revenue tabs (e.g. Lakeshore Trail Guide, May Conference)"], "e": ["KPI cards, team workload and project pipeline all render", "Pipeline shows <b>$10.7M<\/b>, which is all org opportunities (255). The Lakeshore Tourism figure to quote is <b>$635K across 16 opps<\/b>.", "Lakeshore Trail Guide <b>$127,000<\/b> of $175K · May Conference <b>$90,000<\/b> of $95K"], "f": "If Command Center doesn't load, skip it live. It's the custom LWC example."}]}, {"name": "Phase 2 · Action tests on the test record (demo order)", "tag": "change", "steps": [{"id": "2.1", "t": "Edit Allocations: change and save", "c": ["Test project → <b>Resources<\/b> → <b>Edit Allocations<\/b>", "Change one October value → <b>Save<\/b>"], "e": ["Saves without an error", "The allocation table and totals update"], "f": "If you get a save error, check field-level security on the allocation object. Tell the builder the exact error text."}, {"id": "2.2", "t": "Reassign a task", "c": ["Tasks → open the shoot task (▼ → View) → change <b>Assigned To<\/b> from Vanessa to <b>Vince West<\/b> → Save"], "e": ["Saves, and the task list shows Vince", "The Resources and Assignments views reflect the change (if they're designed to)"], "f": "If the user lookup can't find Vince, the persona user or contact is missing or inactive."}, {"id": "2.3", "t": "Bump an End Date", "c": ["Open the landmarks shoot task → change End Date <b>Sep 28 → Oct 3<\/b> → Save", "Go back to the <b>Summary<\/b> tab"], "e": ["Saves", "The phase table on Summary updates on its own, as the talk track says"], "f": "If Summary doesn't update, a roll-up flow isn't firing. Either drop the line 'updates automatically' or get it fixed."}, {"id": "2.4", "t": "Approve the submitted draft", "c": ["Open the draft task with Sign-off = <b>Submitted<\/b> → Approval History → <b>Approve<\/b>"], "e": ["Status changes to <b>Approved<\/b>", "Approval History shows your approval with a timestamp", "No error. Any email alert goes only to your own test address"], "f": "If approval fails, use the fallback of flipping the Sign-off picklist, and tell the builder. If an email alert fires, check who received it."}, {"id": "2.5", "t": "Mass status change (2 tasks)", "c": ["Tasks list → check <b>two rows<\/b> → <b>Change Status<\/b> → pick a status → Save"], "e": ["Both tasks update in one action"], "f": "If the button is missing, the list view or managed-package action isn't available to you."}, {"id": "2.6", "t": "Chatter reply", "c": ["<b>Chatter &amp; Activity<\/b> → <b>Reply<\/b> on an existing thread with a test message"], "e": ["The reply posts and appears in the thread"], "f": "If the reply box is missing too, the live fallback is to narrate it and show the existing thread. Tell the builder."}, {"id": "2.7", "t": "Timeline drag-and-drop (optional)", "c": ["<b>Timeline<\/b> → drag one bar a few days → reopen the task"], "e": ["The task's dates changed to match the drag"], "f": "If dates don't save, drop the line 'those changes save automatically' from the talk track."}, {"id": "2.8", "t": "Roll-ups after changes", "c": ["Refresh the test project's Summary, then the Project Portfolio dashboard"], "e": ["Phase % and health reflect the test changes", "The dashboard refreshes without errors"], "f": "Confirm with the builder: expected roll-up behavior is ___."}]}, {"name": "Phase 3 · AI (look only)", "tag": "safe", "steps": [{"id": "3.1", "go": "tulsa", "t": "Murray summary, second look", "c": ["Reload the Harbor City Tourism opportunity and time how long until Murray renders"], "e": ["It renders consistently, and the content matches the deal"], "f": "If it's slow or inconsistent, plan to skip it in the opening and mention it at the close instead."}]}, {"name": "Phase 4 · Cleanup", "tag": "safe", "steps": [{"id": "4.1", "t": "Data Reset (from the script)", "c": ["On the test project, and on the Travel Guide if you used it:", "Shoot Lakeshore Trail landmarks: End Date back to <b>Sep 28<\/b>", "Shoot state park lodge interiors: Assigned To back to <b>Vanessa Central<\/b>", "Draft: North Shore feature: Sign-off back to <b>Submitted<\/b>", "Revert any allocation, status or timeline changes"], "e": ["Every value matches your baseline from step 0.4"], "f": "If the approval can't be reset to Submitted, recall or resubmit it, or ask the builder for a reset script."}, {"id": "4.2", "go": "guide", "t": "Golden record re-check (look only)", "c": ["Travel Guide → Tasks, Approval History, Resources, Revenue"], "e": ["Every value matches step 0.4", "Revenue still shows <b>$115K / 77% / $8.5K<\/b>", "In Progress filter still shows <b>3<\/b> tasks"], "f": "If anything drifted, fix it now, not tomorrow morning."}, {"id": "4.3", "go": "dash", "t": "Stage tabs for the call", "c": ["Refresh the Project Portfolio dashboard on the morning of the demo", "Open tabs in demo order: Deck → Opportunity → Travel Guide → Dashboard → Command Center", "Close everything else"], "e": ["Tabs are in click-path order, and the dashboard timestamp shows today"], "f": ""}, {"id": "4.4", "t": "Script fixes confirmed with the AE", "c": ["Check the items in the note at the top of this page"], "e": ["Date, customer name, SE name and the pricing line are all settled"], "f": ""}]}], "video": {"spec_title": "Lakeshore Tourism Runs Its Content Newsroom on One Platform", "theme": "corporate", "engine": "auto", "wow": "Revenue, projects and team capacity on one screen. The project shows whether it's funded.", "title_slide": {"title": "Cal Rogers' Tuesday Morning on Salesforce", "say": "Meet Cal Rogers. He runs content operations for Lakeshore Tourism, and here's how his morning goes on Salesforce.", "subtitle": "Lakeshore Tourism · Project management and sponsorship revenue in the PMT Console"}, "scenes": [{"id": "_intro", "title": "the CMO's four criteria", "card": "Useful · Easy to operate · Easy to integrate · Easy to adopt", "say": "You told us what matters to your team. Useful, easy to operate, easy to integrate, easy to adopt. We built this around those four things. Let me show you what Cal Rogers' Tuesday morning looks like."}, {"id": "1.1", "title": "A sponsor signs on", "shot": "Harbor City Tourism opp header + PMT Project link", "say": "Cal's day starts with good news. Harbor City Tourism just committed to a sixty-five thousand dollar Lakeshore Trail content series. And it's linked directly to the project it funds."}, {"id": "1.2", "title": "Agentforce on the deal", "shot": "Opp with the Agentforce summary panel rendered", "say": "On the side, Agentforce is reading the deal history and flagging what needs attention. No digging required."}, {"id": "1.3", "title": "Revenue tied to the work", "shot": "Project Revenue tab: tracker + funding opps", "say": "Here's the revenue tab. A budget tracker, closed won against goal, and every opportunity that funds this project. Cal doesn't have to call the sales team. He just looks."}, {"id": "1.4", "title": "The project at a glance", "shot": "Summary tab: health, phases, period toggle", "say": "This is what Cal sees every morning. Project health, where each phase stands, all scheduled back from the press date. Weekly for stand-ups, quarterly for leadership."}, {"id": "1.5", "title": "Milestones", "shot": "Milestones List modal with dates", "say": "These are the non-negotiable dates. They came from the project template, so Cal never types them twice."}, {"id": "1.7", "title": "The timeline", "shot": "Timeline (Gantt) tab with the Today line", "say": "And the view project managers love. Every task across the year, color coded, with a red line for today. You can see exactly where October gets crowded."}, {"id": "1.8", "title": "Team capacity", "shot": "Resources tab allocation grid", "say": "Before Cal hands out more work, he checks who actually has room. Every person, every month, one grid."}, {"id": "1.9", "title": "Work in flight", "shot": "Tasks tab filtered to In Progress", "say": "Three things in flight. No status update emails. He opens the console and sees it."}, {"id": "2.2", "title": "Reassign in one click", "shot": "Task with Assigned To changed + saved", "say": "Vanessa's Lakeshore Trail shoot ran long. One change, and Vince has the lodge shoot."}, {"id": "2.3", "title": "Adjust the schedule", "shot": "Task end date moved + Summary updated", "say": "The shoot needs a few more days. Cal moves the date, and the phase table updates on its own."}, {"id": "2.4", "title": "Approve for print", "shot": "Approval History showing the approval", "say": "Vince submitted his feature for review. This is a real approval workflow, with a history of who did what and when. And you could add a second step for the CCMO before anything goes to print."}, {"id": "2.5", "title": "Bulk updates", "shot": "Two tasks selected, Change Status", "say": "Two tasks updated in five seconds."}, {"id": "2.6", "title": "Talk where the work lives", "shot": "Chatter reply on the project", "say": "And the conversation lives on the project. Not in an email thread new people can't find."}, {"id": "1.12", "title": "the CMO's view", "shot": "Project Portfolio dashboard", "say": "Now zoom out to the CMO's view. Every project, its health, who's carrying the load, all rolled up in one place."}, {"id": "1.13", "title": "What's possible", "shot": "Command Center", "say": "And this is what's possible beyond the free app. A custom command center, built on the same platform and the same data."}, {"id": "_close", "title": "Crawl, walk, run", "card": "Start with three sales seats · PMT is free · grow on one platform", "say": "So, useful, easy to operate, easy to integrate, easy to adopt. Start with three sales seats, add project management when you're ready. Crawl, walk, run."}], "live": {"1.1": ["navigate: {ORG}/lightning/o/Opportunity/list", "click: \"Harbor City Tourism - Lakeshore Trail Content Series\"", "wait: 3"], "1.2": ["wait: 6"], "1.3": ["click: \"the PMT Project link on the opportunity\"", "wait: 3", "click: \"Revenue tab\"", "wait: 3"], "1.4": ["click: \"Summary tab\"", "wait: 2", "click: \"Month toggle\"", "wait: 2"], "1.5": ["click: \"Milestones List button\"", "wait: 3", "click: \"Close\""], "1.7": ["click: \"Timeline tab\"", "wait: 4"], "1.8": ["click: \"Resources tab\"", "wait: 3"], "1.9": ["click: \"Tasks tab\"", "wait: 2", "click: \"filter tasks to In Progress\"", "wait: 3"], "2.2": ["click: \"row action menu for Shoot state park lodge interiors\"", "click: \"View\"", "wait: 2", "click: \"edit Assigned To\"", "type: \"Assigned To lookup\" | Vince West", "click: \"Vince West option\"", "click: \"Save\"", "wait: 2"], "2.3": ["click: \"row action menu for Shoot Lakeshore Trail landmarks\"", "click: \"View\"", "wait: 2", "click: \"edit End Date\"", "type: \"End Date field\" | 10/3/2026", "click: \"Save\"", "wait: 2"], "2.4": ["click: \"row action menu for Draft: North Shore feature\"", "click: \"View\"", "wait: 2", "click: \"Approval History\"", "wait: 2", "click: \"Approve\"", "click: \"Approve button in the dialog\"", "wait: 2"], "2.5": ["click: \"Tasks tab\"", "click: \"checkbox on the first task row\"", "click: \"checkbox on the second task row\"", "click: \"Change Status\"", "wait: 2"], "2.6": ["click: \"Chatter & Activity tab\"", "click: \"Reply on the latest post\"", "type: \"reply box\" | Reminder: press-ready files are due this week.", "click: \"Comment\"", "wait: 2"], "1.12": ["navigate: {ORG}/lightning/o/Dashboard/home", "click: \"Project Portfolio\"", "wait: 5"], "1.13": ["click: \"Command Center tab\"", "wait: 4"]}, "slides": {"_intro": {"layout": "value-overview", "title": "Built Around the CMO's Four Criteria", "bullets": ["**Useful:** helps the team get work done", "**Easy to operate:** no PhD required", "**Easy to integrate:** M365 stays, Salesforce connects", "**Easy to adopt:** start small, grow in steps"]}, "_close": {"layout": "wrap", "title": "Start With Three Seats, Grow on One Platform", "bullets": ["PMT is free on the AppExchange", "Revenue, projects and people in one place", "Crawl, walk, run"]}}}};
+const PH=CFG.phases||[]; const DEMO_LABEL=CFG.name||"Demo", GOLDEN=CFG.golden_record||"the demo record", CHEAT=CFG.cheatsheet||"";
+const KEY=CFG.storage_key||("preflight-"+(CFG.slug||"demo"));   // never change after first use, or saved notes disappear
+const VID=CFG.video||{}, SLUG=CFG.slug||"demo";
+function ld(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}}
+let S=ld(KEY)||{}, toastT=null, saveT=null;
+function toast(msg,err){const t=document.getElementById("toast");t.textContent=msg;t.classList.toggle("err",!!err);t.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1300);}
+function saveNow(){try{localStorage.setItem(KEY,JSON.stringify(S));S._savedAt=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(S));
+    stamp();toast("Saved ✓");}catch(e){toast("Couldn't save (storage full?). Download the report now.",true);}}
+function save(debounced){clearTimeout(saveT); if(debounced){saveT=setTimeout(saveNow,500);} else saveNow();}
+function stamp(){const d=S._savedAt?new Date(S._savedAt):null;document.getElementById("savedAt").textContent=d?"saved "+d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"not saved yet";}
+function li(a){return "<ul>"+a.map(x=>"<li>"+x+"</li>").join("")+"</ul>"}
+function esc(v){return (v||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
+function strip(x){return x.replace(/<[^>]+>/g,"")}
+
+function base(){let u=(S._org||"").trim().replace(/\/+$/,"");if(u&&!/^https?:\/\//.test(u))u="https://"+u;return u.replace(/\/lightning.*$/,"");}
+function L(k){const b=base();const m={home:b?b+"/lightning/page/home":"",opps:b?b+"/lightning/o/Opportunity/list":"",dash:b?b+"/lightning/o/Dashboard/home":"",
+  reports:b?b+"/lightning/o/Report/home":"",setup:b?b+"/lightning/setup/SetupOneHome/home":""};(CFG.record_links||[]).forEach(r=>m[r.key]=((S._lk||{})[r.key]||"").trim());return m[k]||"";}
+const GOLBL=Object.assign({home:"Open org",dash:"Open Dashboards",opps:"Open Opportunities",reports:"Open Reports"},Object.fromEntries((CFG.record_links||[]).map(r=>[r.key,"Open "+r.label])));
+function quick(){const q=[["home","Org home"],...(CFG.record_links||[]).map(r=>[r.key,r.label]),["opps","Opportunities"],["dash","Dashboards"],["reports","Reports"],["setup","Setup"]];
+  const h=q.filter(x=>L(x[0])).map(x=>`<a class="ql" href="${L(x[0])}" target="_blank">${x[1]} ↗</a>`).join("");
+  document.getElementById("quick").innerHTML=h||'<span style="font-size:11.5px;opacity:.7">Paste the org URL to get quick links.</span>';
+  document.querySelectorAll(".golink").forEach(a=>{const u=L(a.dataset.go);a.style.display=u?"":"none";if(u)a.href=u;});}
+document.addEventListener("input",e=>{if(e.target.id=="orgUrl"){S._org=e.target.value;save(true);quick();}else if(e.target.dataset&&e.target.dataset.lk){S._lk=S._lk||{};S._lk[e.target.dataset.lk]=e.target.value;save(true);quick();}});
+
+let ACTIVE=null;
+function shotsHtml(id){return ((S[id]||{}).img||[]).map((u,i)=>`<div class="shot" onclick="zoom('${id}',${i})"><img src="${u}" alt=""><b onclick="event.stopPropagation();delShot('${id}',${i})">✕</b></div>`).join("");}
+function drawShots(id){const el=document.getElementById("sh"+id);if(el)el.innerHTML=shotsHtml(id);upd();vidUpd();}
+function zoom(id,i){document.getElementById("lbimg").src=S[id].img[i];document.getElementById("lb").style.display="flex";}
+function delShot(id,i){if(!confirm("Remove this image?"))return;S[id].img.splice(i,1);save(false);drawShots(id);}
+function shrink(file){return new Promise((ok,bad)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const M=1400,sc=Math.min(1,M/Math.max(im.width,im.height));
+  const c=document.createElement("canvas");c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+  ok(c.toDataURL("image/jpeg",0.72));};im.onerror=bad;im.src=r.result;};r.onerror=bad;r.readAsDataURL(file);});}
+async function addFiles(id,files){const imgs=[...files].filter(f=>f.type.startsWith("image/"));if(!imgs.length)return;
+  S[id]=S[id]||{};S[id].img=S[id].img||[];const before=S[id].img.length;
+  for(const f of imgs){try{S[id].img.push(await shrink(f));}catch(e){toast("Couldn't read that image",true);}}
+  try{localStorage.setItem(KEY,JSON.stringify(S));saveNow();toast(`Image added to ${id} ✓`);}
+  catch(e){S[id].img.length=before;toast("Browser storage is full. Download the report, then remove older images.",true);}
+  drawShots(id);}
+function stepOf(el){const s=el&&el.closest&&el.closest(".step");return s?s.id.slice(1):null;}
+document.addEventListener("focusin",e=>setActive(stepOf(e.target)));
+document.addEventListener("mousedown",e=>{const id=stepOf(e.target);if(id)setActive(id);});
+function setActive(id){if(!id)return;if(ACTIVE&&document.getElementById("s"+ACTIVE))document.getElementById("s"+ACTIVE).classList.remove("active");ACTIVE=id;document.getElementById("s"+id).classList.add("active");}
+document.addEventListener("paste",e=>{const items=[...(e.clipboardData||{}).items||[]].filter(i=>i.type.startsWith("image/"));if(!items.length)return;
+  if(!ACTIVE){toast("Click a step first, then paste",true);return;}e.preventDefault();addFiles(ACTIVE,items.map(i=>i.getAsFile()));});
+document.addEventListener("dragover",e=>{const id=stepOf(e.target);if(id){e.preventDefault();document.getElementById("s"+id).classList.add("drag");}});
+document.addEventListener("dragleave",e=>{const id=stepOf(e.target);if(id)document.getElementById("s"+id).classList.remove("drag");});
+document.addEventListener("drop",e=>{const id=stepOf(e.target);if(!id)return;e.preventDefault();document.getElementById("s"+id).classList.remove("drag");setActive(id);addFiles(id,e.dataTransfer.files);});
+
+function aiHtml(id){const a=(S[id]||{}).ai;if(!a)return "";const L=x=>Array.isArray(x)?"<ul>"+x.map(i=>"<li>"+esc(i)+"</li>").join("")+"</ul>":esc(x);
+  return `<div class="aibox"><div class="lbl e">✨ AI suggestion${a.severity?" · "+esc(a.severity):""}</div>${a.root_cause?"<div><b>Likely cause:</b> "+esc(a.root_cause)+"</div>":""}${a.suggested_fix?"<div><b>Fix:</b> "+esc(a.suggested_fix)+"</div>":""}${a.done_when?"<div><b>Done when:</b>"+L(a.done_when)+"</div>":""}${a.talk_track?"<div><b>Talk track:</b> "+esc(a.talk_track)+"</div>":""}</div>`;}
+function aiPayload(){const rep=buildReport();return rep.steps.filter(s=>s.result=="fail"||s.result=="unchecked"||s.tester_notes||s.requested_fix)
+  .map(s=>({id:s.id,title:s.title,phase_type:s.phase_type,result:s.result,click:s.click,expected:s.expected,if_not:s.if_not,tester_notes:s.tester_notes,requested_fix:s.requested_fix,screenshots:s.screenshots.length}));}
+function aiPromptText(){return `You are a senior Salesforce demo engineer. Below is a presenter's dry-run of a demo org (${DEMO_LABEL}). Golden record: ${GOLDEN} (never change it except to restore its baseline). Test record: ${S._t1||"(not set)"}.
+For every step with result "fail" or "unchecked", and for any step whose tester_notes ask for a change, diagnose it and propose a fix that a coding/build agent can carry out in the org. Only use subscriber-side changes: data, Lightning pages, layouts, flows, permissions. No managed-package metadata. Where tester_notes disagree with "expected", the presenter wins. If a fix needs a decision from the presenter, say so in suggested_fix and offer the options.
+Return ONLY a JSON array, no prose:
+[{"id":"1.3","severity":"Blocker|Fix before demo|Nice to have|Talk track","root_cause":"…","suggested_fix":"concrete steps, object/field names","done_when":["acceptance check", "…"],"talk_track":"optional script change"}]
+STEPS:
+${JSON.stringify(aiPayload(),null,1)}`;}
+function aiApply(arr){let n=0;(arr||[]).forEach(a=>{if(a&&a.id&&document.getElementById("s"+a.id)){S[a.id]=S[a.id]||{};S[a.id].ai=a;document.getElementById("ai"+a.id).innerHTML=aiHtml(a.id);n++;}});save(false);toast(`✨ ${n} suggestion${n==1?"":"s"} added`);return n;}
+function aiParse(txt){txt=String(txt||"");const m=txt.match(/\[[\s\S]*\]/);return JSON.parse(m?m[0]:txt);}
+function aiImport(){try{const n=aiApply(aiParse(document.getElementById("aiBack").value));if(n)document.getElementById("aim").style.display="none";}catch(e){toast("That doesn't look like the JSON array",true);}}
+async function aiSuggest(){const prompt=aiPromptText();
+  const ask=window.cowork&&window.cowork.askClaude;
+  if(ask){toast("✨ Asking Claude…");try{const r=await window.cowork.askClaude(prompt,[]);const txt=typeof r=="string"?r:(r&&(r.text||r.content||r.result||JSON.stringify(r)));aiApply(aiParse(txt));return;}catch(e){toast("AI call failed. Use copy and paste instead.",true);}}
+  document.getElementById("aiPrompt").value=prompt;document.getElementById("aiBack").value="";document.getElementById("aim").style.display="flex";}
+
+/* ---- DEMO VIDEO: scenes in the original script's order, narration adapted from the v3 talk track ---- */
+const VIDEO=VID.scenes||[];
+const VMAP=Object.fromEntries(VIDEO.filter(v=>!v.id.startsWith("_")).map((v,i)=>[v.id,{...v,n:i+1}]));
+function recHtml(id){const v=VMAP[id];if(!v)return "";const got=((S[id]||{}).img||[]).length>0;
+  return `<div class="rec ${got?"got":""}" id="rec${id}"><span class="ic">${got?"✅":"📸"}</span><div><b>${got?"Video shot captured":"Capture for the demo video"}</b> · Scene ${v.n} of ${Object.keys(VMAP).length}: ${esc(v.title)}<br><span class="muted" style="font-size:12px">Frame: ${esc(v.shot)}. Close popups and hide your notes, then press ⌘⇧⌃4 and ⌘V here.</span><div class="say">🎙 "${esc(v.say)}"</div></div></div>`;}
+function vidUpd(){const ids=Object.keys(VMAP),got=ids.filter(i=>((S[i]||{}).img||[]).length).length;const n=document.getElementById("vidN");if(!n)return;
+  n.textContent=`${got} / ${ids.length}`;document.getElementById("vidFill").style.width=(100*got/ids.length)+"%";
+  ids.forEach(i=>{const el=document.getElementById("rec"+i);if(el)el.outerHTML=recHtml(i);});}
+function toggleRec(){document.body.classList.toggle("recmode");document.getElementById("recBtn").textContent="📸 Recording mode: "+(document.body.classList.contains("recmode")?"on":"off");}
+function holdFor(s){return Math.max(4,Math.round(s.split(/\s+/).length/2.4+1.5));}
+function exportVideoKit(){
+  const scenes=VIDEO.map((v,i)=>{const im=v.id.startsWith("_")?[]:((S[v.id]||{}).img||[]);return {n:i+1,id:v.id,title:v.title,card:v.card||null,shot_brief:v.shot||null,narration:v.say,hold:holdFor(v.say),image:im[0]||null,extra_images:im.slice(1),missing:!v.id.startsWith("_")&&!im.length};});
+  const missing=scenes.filter(s=>s.missing).map(s=>s.id);
+  const narration=scenes.map(s=>({slide:s.n,hold:s.hold,text:s.narration}));
+  const kit={format:"demo-video-kit/v1",demo:DEMO_LABEL,source_script:CFG.sources||"",persona:CFG.persona||"",resolution:"1920x1080",scenes,narration,missing_shots:missing,
+    agent_prompt:"Render a narrated demo video (1920x1080, 30fps) from this kit. One scene per entry, in order. Show `image` full-frame (or a branded title card with `title` and `card` when image is null). Use `narration` as the voiceover and hold each scene for `hold` seconds (pad with silence). Add a gentle Ken Burns zoom (100→104%) on screenshots, a soft cross-fade between scenes and lower-third captions with `title`. `narration` is already in [{slide,hold,text}] format for TTS scripts (e.g. ElevenLabs or macOS say). If missing_shots is non-empty, ask the presenter for those frames first. Output: final.mp4 plus captions.srt."};
+  const e=x=>String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;");const json=JSON.stringify(kit).replace(/</g,"\\u003c");
+  const h=`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${e(DEMO_LABEL)} · demo video kit</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#faf9f5;color:#141413;font-family:-apple-system,BlinkMacSystemFont,Inter,Segoe UI,Arial,sans-serif}
+.top{display:flex;gap:10px;align-items:center;padding:14px 22px;background:#fff;border-bottom:1px solid #e8e6dc;font:12px ui-monospace,Menlo,monospace;flex-wrap:wrap;color:#6b6a65}
+.top b{color:#141413;font-family:Georgia,serif;font-weight:500;font-size:17px}.top .mk{color:#d97757}
+.top button,.top select{background:#fff;color:#141413;border:1px solid #e8e6dc;border-radius:6px;padding:6px 11px;font:12px ui-monospace,monospace;cursor:pointer}
+.top button:hover{border-color:#d97757;color:#c96442}.top button.go{background:#141413;color:#fff;border-color:#141413}.top button.go:hover{background:#c96442;border-color:#c96442;color:#fff}
+.stage{position:relative;width:min(94vw,calc((100vh - 150px)*16/9));aspect-ratio:16/9;margin:22px auto 12px;border-radius:10px;overflow:hidden;background:#fff;border:1px solid #e8e6dc;box-shadow:0 8px 30px rgba(20,20,19,.06)}
+.frame{position:absolute;inset:0;opacity:0;transition:opacity .7s}.frame.on{opacity:1}
+.frame img{width:100%;height:100%;object-fit:contain;background:#fff;transform-origin:center;transition:transform 12s linear}.frame.on img{transform:scale(1.03)}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:8%;background:#faf9f5}
+.card h2{font-family:Georgia,serif;font-weight:500;font-size:min(4.6vw,60px);margin:0 0 14px;color:#141413;letter-spacing:-.01em}.card p{font-size:min(2vw,26px);margin:0;color:#6b6a65}
+.card .k{font:min(1.1vw,13px) ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#d97757;margin-bottom:14px}
+.miss{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#f5f4ee;color:#c96442;font:16px ui-monospace,monospace}
+.lower{position:absolute;left:3%;bottom:5%;background:rgba(255,255,255,.94);border:1px solid #e8e6dc;border-left:3px solid #d97757;padding:9px 15px;border-radius:6px;max-width:70%;box-shadow:0 4px 14px rgba(20,20,19,.08)}
+.lower .s{font:11px ui-monospace,monospace;color:#d97757;text-transform:uppercase;letter-spacing:.08em}.lower .t{font-size:min(1.7vw,21px);color:#141413;font-weight:600}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:10px 18%;text-align:center;font-size:min(1.4vw,17px);color:#141413;background:linear-gradient(transparent,rgba(250,249,245,.95) 40%)}
+.cap:empty{display:none}
+.list{max-width:1120px;margin:0 auto 40px;padding:0 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.it{background:#fff;border:1px solid #e8e6dc;border-radius:8px;padding:9px;font-size:12.5px;cursor:pointer;color:#3d3d3a}.it:hover{border-color:#d97757}
+.it img{width:100%;border-radius:4px;border:1px solid #e8e6dc}.it .x{color:#c96442}.it b{color:#d97757;font-family:ui-monospace,monospace}
+.note{max-width:1120px;margin:0 auto 14px;padding:0 22px;font-size:13px;color:#6b6a65}.note code{background:#f0eee6;padding:1px 5px;border-radius:4px}</style></head><body>
+<div class="top"><span class="mk">✻</span><b>${e(DEMO_LABEL)}</b> · ${scenes.length} scenes · ~${Math.round(scenes.reduce((a,s)=>a+s.hold,0)/60*10)/10} min ${missing.length?` · <span style="color:#b5452f">${missing.length} missing shots: ${missing.join(", ")}</span>`:" · all shots captured ✓"}
+ <span style="flex:1"></span><select id="voice"></select><button class="go" onclick="play(0)">▶ Play narrated</button><button onclick="stop()">■ Stop</button><button onclick="dl('narration.json',JSON.stringify(K.narration,null,2))">narration.json</button><button onclick="dl('video-kit.json',JSON.stringify(K,null,2))">video-kit.json</button><button onclick="dl('captions.srt',srt())">captions.srt</button></div>
+<div class="stage" id="stage"></div>
+<div class="note">Play it full-screen and screen-record (⌘⇧5) for an instant narrated demo, or hand <b>video-kit.json</b> or this file to a video skill or coding agent to render a polished MP4 (the rendering instructions are in <code>agent_prompt</code>). For the real movie, use <b>🎬 Make the movie</b> on the dry-run page. The browser voice is a placeholder; swap in ElevenLabs using <b>narration.json</b>.</div>
+<div class="list" id="list"></div>
+<script id="video-kit" type="application/json">${json}<\/script>
+<script>
+const K=JSON.parse(document.getElementById("video-kit").textContent);let cur=-1,timer=null,playing=false;
+const st=document.getElementById("stage");
+K.scenes.forEach((s,i)=>{const d=document.createElement("div");d.className="frame";d.id="f"+i;
+  d.innerHTML=s.image?'<img src="'+s.image+'">':(s.card||s.id.startsWith("_")?'<div class="card"><div class="k">✻ Salesforce · '+K.persona+'</div><h2>'+s.title+'</h2><p>'+(s.card||"")+'</p></div>':'<div class="miss">📸 Missing shot · Scene '+s.n+'<br><span style="color:#6b6a65;font-size:13px;margin-top:6px">'+(s.shot_brief||"")+'</span></div>');
+  if(!s.id.startsWith("_"))d.innerHTML+='<div class="lower"><div class="s">Scene '+s.n+'</div><div class="t">'+s.title+'</div></div>';
+  d.innerHTML+='<div class="cap" id="c'+i+'"></div>';st.appendChild(d);
+  const it=document.createElement("div");it.className="it";it.onclick=()=>play(i,true);
+  it.innerHTML=(s.image?'<img src="'+s.image+'">':'<div style="aspect-ratio:16/9;background:#faf9f5;border:1px solid #e8e6dc;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#141413;font-family:Georgia,serif">'+(s.missing?'<span class=x>missing</span>':s.title)+'</div>')+'<div style="margin-top:6px"><b>'+s.n+'</b> '+s.title+' · '+s.hold+'s</div><div style="color:#9b9a94;margin-top:3px">'+s.narration+'</div>';
+  document.getElementById("list").appendChild(it);});
+function show(i){document.querySelectorAll(".frame").forEach(f=>f.classList.remove("on"));const f=document.getElementById("f"+i);if(f)f.classList.add("on");cur=i;}
+show(0);
+const sel=document.getElementById("voice");function voices(){const v=speechSynthesis.getVoices();sel.innerHTML=v.map((x,i)=>'<option value="'+i+'"'+(/Samantha|Ava|Google US English|Jenny|Aria/.test(x.name)?" selected":"")+'>'+x.name+'</option>').join("");}
+if(window.speechSynthesis){voices();speechSynthesis.onvoiceschanged=voices;}
+function play(i,one){stop();playing=true;step(i,one);}
+function step(i,one){if(!playing||i>=K.scenes.length){playing=false;return;}show(i);const s=K.scenes[i];const cap=document.getElementById("c"+i);cap.textContent=s.narration;
+  const t0=Date.now();const next=()=>{if(!playing)return;const wait=Math.max(0,s.hold*1000-(Date.now()-t0));timer=setTimeout(()=>{if(!one)step(i+1);else playing=false;},wait);};
+  if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(s.narration);const v=speechSynthesis.getVoices()[sel.value];if(v)u.voice=v;u.rate=1.0;u.onend=next;u.onerror=next;speechSynthesis.speak(u);}else next();}
+function stop(){playing=false;clearTimeout(timer);if(window.speechSynthesis)speechSynthesis.cancel();}
+function dl(n,c){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([c]));a.download=n;a.click();}
+function srt(){let t=0;return K.scenes.map((s,i)=>{const f=x=>{const h=String(Math.floor(x/3600)).padStart(2,"0"),m=String(Math.floor(x%3600/60)).padStart(2,"0"),sec=String(Math.floor(x%60)).padStart(2,"0");return h+":"+m+":"+sec+",000"};const a=f(t);t+=s.hold;return (i+1)+"\\n"+a+" --> "+f(t)+"\\n"+s.narration+"\\n";}).join("\\n");}
+<\/script></body></html>`;
+  const b=new Blob([h],{type:"text/html"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=KEY+"-video-kit.html";a.click();
+  toast(missing.length?`🎬 Video kit built (${missing.length} shots missing)`:"🎬 Video kit built ✓");}
+
+/* ---- autonomous-demo-recorder bundle (zip: script.md + screenshots + narration) ---- */
+function crc32(b){let c,t=crc32.t;if(!t){t=crc32.t=[];for(let n=0;n<256;n++){c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}}c=0^(-1);for(let i=0;i<b.length;i++)c=(c>>>8)^t[(c^b[i])&0xFF];return (c^(-1))>>>0;}
+function zip(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  files.forEach(f=>{const name=enc.encode(f.name),data=typeof f.data=="string"?enc.encode(f.data):f.data,crc=crc32(data);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(8,0,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(h.buffer),name,data);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,0x0314,true);if(f.exec)c.setUint32(38,(0o100755<<16)>>>0,true);else c.setUint32(38,(0o100644<<16)>>>0,true);c.setUint16(6,20,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,name.length,true);c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),name);off+=30+name.length+data.length;});
+  const csz=cen.reduce((a,x)=>a+x.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,csz,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:"application/zip"});}
+function b64bytes(u){const s=atob(u.split(",")[1]);const a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a;}
+function stepById(id){for(const p of PH)for(const s of p.steps)if(s.id==id)return s;return null;}
+/* Live-browser actions per scene, written as quoted intents that `/demo-instruct --smart` resolves on the live page */
+const LIVE=VID.live||{};
+const SLIDES=VID.slides||{};
+function specHeader(kind,o){const ts=VID.title_slide||{};return [`# ${VID.spec_title||DEMO_LABEL}`,"",
+ `<!-- output: ~/Desktop/${CFG.slug||"demo"}-${kind}.mp4 -->`,`<!-- engine: ${VID.engine||"auto"} -->`,`<!-- theme: ${VID.theme||"corporate"} -->`,`<!-- viewport: 1920x1080 -->`,`<!-- pause-after: 250 -->`,
+ CFG.presenter?`<!-- presenter: ${CFG.presenter} -->`:"",CFG.presenter_title?`<!-- presenter-title: ${CFG.presenter_title} -->`:"",`<!-- target-duration: ${VIDEO.reduce((a,v)=>a+holdFor(v.say),0)} -->`,
+ VID.wow?`<!-- wow: ${VID.wow} -->`:"",
+ kind=="live"?`<!-- login-required: true -->\n<!-- start-url: ${o} -->\n<!-- headed: true -->`:"","",
+ ...(ts.title?[`## ${ts.title}`,`<!-- scene: slide -->`,`<!-- layout: title -->`,"",`> ${ts.say||""}`,"",`- ${ts.subtitle||DEMO_LABEL}`,""]:[])].filter((x,i,a)=>x!==""||a[i-1]!=="").join("\n");}
+function slideStep(v){const sl=SLIDES[v.id];return [`## ${sl.title}`,`<!-- scene: slide -->`,`<!-- layout: ${sl.layout} -->`,"",`> ${v.say}`,"",...sl.bullets.map(b=>"- "+b),""].join("\n");}
+function toPng(u){return new Promise(ok=>{try{const im=new Image();im.onload=()=>{const c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);ok(c.toDataURL("image/png"));};im.onerror=()=>ok(u);im.src=u;}catch(e){ok(u);}});}
+async function exportRecorderZip(){toast("🎥 Building recorder bundle…");
+  const files=[],pad=n=>String(n).padStart(2,"0"),o=base()||"<REPLACE-WITH-YOUR-ORG-URL>",missing=[];
+  let shot=[specHeader("screens",o)],live=[specHeader("live",o)];
+  VIDEO.forEach((v,i)=>{const n=i+2;
+    if(v.id.startsWith("_")){shot.push(slideStep(v));live.push(slideStep(v));return;}
+    const im=(S[v.id]||{}).img||[];const fn=`screenshots/scene-${pad(n)}.png`;
+    if(im.length){files.push({name:fn,src:im[0]});im.slice(1).forEach((u,j)=>files.push({name:`screenshots/scene-${pad(n)}-alt${j+1}.png`,src:u}));
+      shot.push([`## ${v.title}`,`<!-- scene: slide -->`,`<!-- image: ${fn} -->`,`<!-- dryrun-step: ${v.id} -->`,"",`> ${v.say}`,""].join("\n"));}
+    else{missing.push(v.id);shot.push([`## ${v.title}`,`<!-- scene: slide -->`,`<!-- layout: value-overview -->`,`<!-- dryrun-step: ${v.id} (MISSING SCREENSHOT: capture "${v.shot}" and switch this to an image: slide) -->`,"",`> ${v.say}`,"",`- ${v.shot}`,""].join("\n"));}
+    const acts=(LIVE[v.id]||[`wait: 3`]).map(a=>"- "+String(a).replace(/\{ORG\}/g,o));
+    live.push([`## ${v.title}`,`<!-- scene: browser -->`,`<!-- dryrun-step: ${v.id}${/^2\./.test(v.id)?" · CHANGES DATA: reset afterward":""} -->`,im.length?`<!-- reference-screenshot: ${fn} -->`:"","",`> ${v.say}`,"",...acts,""].filter((x,k)=>x!==""||k>3).join("\n"));});
+  for(const f of files)if(f.src){f.data=b64bytes(await toPng(f.src));delete f.src;}
+  files.unshift({name:`${CFG.slug||"demo"}-live.md`,data:live.join("\n")});
+  files.unshift({name:`${CFG.slug||"demo"}-screens.md`,data:shot.join("\n")});
+  files.push({name:"make-movie.command",data:MAKE_MOVIE.replace(/__SLUG__/g,CFG.slug||"demo"),exec:true});
+  files.push({name:"narration.json",data:JSON.stringify(VIDEO.map((v,i)=>({slide:i+2,hold:holdFor(v.say),text:v.say})),null,2)});
+  files.push({name:"README.md",data:[`# ${DEMO_LABEL}: autonomous-demo-recorder bundle`,"",
+   "Two specs in the recorder's own schema (`commands/demo-instruct.md`):","",
+   "| Spec | What it records | Needs |","|---|---|---|",
+   "| `"+SLUG+"-screens.md` | Branded intro/close slides plus your dry-run **screenshots** as image slides, narrated | Nothing: no org, no login. Works tonight. |",
+   "| `"+SLUG+"-live.md` | The same story, **driving the live org** (browser scenes with quoted intents) | A logged-in org session, plus `--smart` to resolve the intents |","",
+   "## Make the movie (no Claude needed)","Double-click `make-movie.command` (or `bash make-movie.command`). It finds the recorder, installs any missing deps, renders `~/Desktop/"+SLUG+"-screens.mp4` and opens it. `bash make-movie.command live` renders the live-org version.","","## Or record from Claude Code","```bash",`cd "<this unzipped folder>"   # image: paths are relative to the folder you run from`,"```","In Claude Code (with the demo-recorder plugin installed):","```",
+   "/demo-instruct "+SLUG+"-screens.md","/demo-instruct "+SLUG+"-live.md --smart","```",
+   "`/demo-instruct` shows you a review card before it records. Check the narration there.","",
+   "## Before the live recording",
+   `- Replace \`${o}\` if it's still the placeholder.`,"- Enter credentials only in your own session. None are stored here.",
+   "- Scenes marked **CHANGES DATA** edit records. Record on the test record, or reset afterward"+((CFG.reset||[]).length?": "+CFG.reset.join(" · "):"."),
+   missing.length?`- Missing screenshots (shown as placeholder slides): ${missing.join(", ")}`:"- Every scene has a screenshot.",
+   "","`narration.json` is `[{slide, hold, text}]` for any other TTS or video tool."].join("\n")});
+  const a=document.createElement("a");a.href=URL.createObjectURL(zip(files));a.download=KEY+"-demo-recorder.zip";a.click();
+  toast(`🎥 Recorder bundle: 2 specs, ${files.filter(f=>f.name.startsWith("screenshots/")).length} screenshots${missing.length?", "+missing.length+" missing":""}`);}
+
+const MAKE_MOVIE=`#!/bin/bash
+# make-movie.command: render this demo with autonomous-demo-recorder (Vaibhav Varshney).
+# Usage: double-click, or:  bash make-movie.command [screens|live]
+cd "$(dirname "$0")" || exit 1
+MODE="\${1:-screens}"; SPEC="__SLUG__-\${MODE}.md"
+echo "✻ demo-preflight · rendering $SPEC"
+find_recorder(){
+  [ -n "$DEMO_RECORDER" ] && [ -f "$DEMO_RECORDER/scripts/record_demo.py" ] && { echo "$DEMO_RECORDER"; return; }
+  for d in "$HOME"/Downloads/autonomous-demo-recorder* "$HOME"/demo-recorder* "$HOME"/autonomous-demo-recorder* "$HOME"/Projects/autonomous-demo-recorder* "$HOME"/.claude/plugins/*/*demo-recorder* "$HOME"/.claude/plugins/*/*/*demo-recorder*; do
+    [ -f "$d/scripts/record_demo.py" ] && { echo "$d"; return; }; done
+  f=$(find "$HOME/.claude" "$HOME/Downloads" "$HOME/Documents" -maxdepth 6 -path "*scripts/record_demo.py" 2>/dev/null | head -1)
+  [ -n "$f" ] && dirname "$(dirname "$f")"; }
+R="$(find_recorder)"
+if [ -z "$R" ]; then echo "❌ Couldn't find autonomous-demo-recorder. Clone it, or set DEMO_RECORDER=/path/to/it and re-run."; read -r -p "Press Return to close."; exit 1; fi
+echo "✓ recorder: $R"
+if ! python3 "$R/scripts/record_demo.py" --check-deps >/tmp/demo-deps.txt 2>&1; then
+  echo "… installing missing dependencies (one time)"; bash "$R/tools/setup.sh" || true; fi
+EXTRA=""; [ "$MODE" = "live" ] && EXTRA="--smart --headed"
+OUT="$(grep -m1 -o '<!-- output: [^ ]*' "$SPEC" | sed 's/<!-- output: //; s#^~#'"$HOME"'#')"
+python3 "$R/scripts/record_demo.py" "$SPEC" $EXTRA || { echo "❌ Recording failed. In Claude Code, run: /demo-instruct $SPEC"; read -r -p "Press Return to close."; exit 1; }
+echo "🎬 Done: $OUT"; [ -f "$OUT" ] && open "$OUT" 2>/dev/null; read -r -p "Press Return to close."
+`;
+async function makeMovie(){const ids=Object.keys(VMAP),missing=ids.filter(i=>!((S[i]||{}).img||[]).length);
+  document.getElementById("mvZip").textContent=KEY+"-demo-recorder.zip";document.getElementById("mvOut").textContent=`~/Desktop/${CFG.slug||"demo"}-screens.mp4`;
+  document.getElementById("mvWarn").textContent=missing.length?`Heads-up: ${missing.length} scene${missing.length>1?"s are":" is"} missing a screenshot (${missing.join(", ")}). They'll render as branded placeholder slides.`:"";
+  document.getElementById("movie").style.display="flex";await exportRecorderZip();}
+
+function loadImg(u){return new Promise(ok=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src=u;});}
+async function stepSheet(n,s){const W=1600,P=24;const ims=(await Promise.all(s.screenshots.map(loadImg))).filter(Boolean);
+  const hs=ims.map(im=>Math.round(im.naturalHeight*(W-2*P)/im.naturalWidth));const H=124+hs.reduce((a,h)=>a+h+P,0);
+  const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.fillStyle="#faf9f5";x.fillRect(0,0,W,H);x.fillStyle="#d97757";x.fillRect(0,0,W,6);
+  const sev=(s.ai_suggestion||{}).severity;x.fillStyle="#c96442";x.font="bold 20px -apple-system,Helvetica,Arial";x.fillText(`FIX ${String(n).padStart(2,"0")} · STEP ${s.id} · ${s.result.toUpperCase()}${sev?" · "+sev:""}`,P,38);
+  x.fillStyle="#141413";x.font="bold 30px -apple-system,Helvetica,Arial";x.fillText(s.title,P,76);
+  x.fillStyle="#6b6a65";x.font="18px -apple-system,Helvetica,Arial";x.fillText(("Presenter saw: "+(s.tester_notes||"-")).slice(0,160),P,106);
+  let y=124;ims.forEach((im,i)=>{x.strokeStyle="#e8e6dc";x.strokeRect(P-1,y-1,W-2*P+2,hs[i]+2);x.drawImage(im,P,y,W-2*P,hs[i]);y+=hs[i]+P;});
+  return c.toDataURL("image/png");}
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);}
+async function exportMeshZip(){toast("📦 Building agent hand-off…");const rep=buildReport(),files=[],md=[],names={};const fx=rep.steps.filter(s=>rep.fix_list.includes(s.id));
+  let n=0;for(const s of fx){if(!s.screenshots.length)continue;n++;const fn=`fix-${String(n).padStart(2,"0")}-step-${s.id}-${slug(s.title)}.png`;names[s.id]=fn;files.push({name:fn,data:b64bytes(await stepSheet(n,s))});}
+  md.push(`# ${DEMO_LABEL}: fix brief`,"",`**Golden record (don't change):** ${GOLDEN} · **Test record:** ${rep.test_record||"(not set)"}`,`**Dry run:** ${rep.summary.pass} passed · ${rep.summary.fail} failed · ${rep.summary.skip} skipped · ${rep.summary.unchecked} unchecked`,"","## Instructions",rep.agent_brief,"",
+   "**Attached images:** one labeled image per failed step, named `fix-NN-step-<id>-….png` in work order. Each one shows what the presenter actually saw.","",`## Fix list (${fx.length})`,"");
+  for(const s of fx){const a=s.ai_suggestion||{};
+    md.push(`### ${s.id} · ${s.title}${a.severity?"  ·  "+a.severity:""}`);if(names[s.id])md.push(`- **Screenshot:** \`${names[s.id]}\` (attached)`);
+    md.push(`- **Result:** ${s.result}`,`- **What the presenter saw:** ${s.tester_notes||"-"}`);
+    if(s.requested_fix)md.push(`- **Requested fix:** ${s.requested_fix}`);if(a.root_cause)md.push(`- **Root cause:** ${a.root_cause}`);if(a.suggested_fix)md.push(`- **Suggested fix:** ${a.suggested_fix}`);
+    md.push("- **Done when:**",...((a.done_when&&a.done_when.length?a.done_when:s.expected).map(d=>"  - [ ] "+d)),`- **Click path:** ${s.click.join(" → ")}`,`- **Script expects:** ${s.expected.join("; ")}`);
+    if(s.if_not)md.push(`- **Hint:** ${s.if_not}`);md.push("");}
+  md.push("## Reply format","Reply with a table: step | what you changed (records/metadata, API names) | how you verified 'Done when' | anything blocked. Then list any talk-track lines that need updating.");
+  const lean={...rep,steps:rep.steps.map(s=>{const{screenshots,...r}=s;return {...r,screenshot:names[s.id]||null};})};
+  files.unshift({name:"01-dryrun-report.json",data:JSON.stringify(lean,null,2)});files.unshift({name:"00-fix-brief.md",data:md.join("\n")});
+  const a=document.createElement("a");a.href=URL.createObjectURL(zip(files));a.download=KEY+"-agent-handoff.zip";a.click();
+  toast(`📦 Hand-off ready: 2 files + ${n} images. Unzip, ⌘A, drag in.`);}
+
+function hydrate(){const $=id=>document.getElementById(id),all=(c,v)=>document.querySelectorAll("."+c).forEach(el=>el.textContent=v);
+  document.title=`${DEMO_LABEL} · Demo Preflight`;$("brandName").textContent=DEMO_LABEL;$("brandSub").textContent="Dry-run walkthrough"+(CFG.date?" · "+CFG.date:"");
+  $("heroTitle").textContent=DEMO_LABEL;$("heroSub").textContent=[CFG.date,CFG.tagline].filter(Boolean).join(" · ");$("testLbl").textContent=CFG.test_record_label||"Test record";
+  all("src",CFG.sources||"the demo script");all("bld",CFG.builder||"the demo builder");all("gold",GOLDEN);
+  $("extraNotes").innerHTML=(CFG.extra_notes||[]).map(n=>`<div class="warn${n.kind=="info"?" info":""}"><b>${n.title||""}</b> ${n.html||""}</div>`).join("");
+  $("reclinks").innerHTML=(CFG.record_links||[]).map(r=>`<label class="tr">${r.label} link (optional)<input type="text" id="lk_${r.key}" data-lk="${r.key}" placeholder="paste the record URL"></label>`).join("");
+  if(!VIDEO.length){document.querySelectorAll(".vidbar,[onclick='makeMovie()'],[onclick='exportVideoKit()'],#recBtn").forEach(el=>el.style.display="none");}}
+function render(){
+  let h="", nav="";
+  PH.forEach((p,pi)=>{
+    h+=`<div class="phase" id="ph${pi}"><b>${p.name}</b><span class="tag ${p.tag}">${p.tag=="safe"?"read-only / safe":"changes data — test record only"}</span></div>`;
+    nav+=`<div class="sec-label">${p.name}</div>`;
+    p.steps.forEach(s=>{
+      const st=(S[s.id]||{}).r||"";
+      const chips=(s.scene!=null&&CHEAT?`<a class="scene-link" href="${CHEAT}#scene${s.scene}" target="_blank" title="Open this scene in the presenter cheat sheet">Scene ${s.scene} ↗</a>`:"")+
+        (s.tw||[]).map(n=>`<span class="tw tw${n}">${n}</span>`).join("")+(s.go?`<a class="golink" data-go="${s.go}" target="_blank" style="display:none">${GOLBL[s.go]||"Open"} ↗</a>`:"");
+      h+=`<div class="step ${st}" id="s${s.id}"${VMAP[s.id]?" data-rec":""}><h3><span class="id">${s.id}</span>${s.t} ${chips}</h3>
+        <div class="lbl c">Click</div>${li(s.c)}
+        <div class="lbl e">You should see</div>${li(s.e)}
+        ${s.f?`<div class="lbl f">If not</div><div class="fixbox">${s.f}</div>`:""}
+        <div class="acts">
+          <button class="p ${st=="pass"?"on":""}" onclick="mark('${s.id}','pass')">✓ Pass</button>
+          <button class="f ${st=="fail"?"on":""}" onclick="mark('${s.id}','fail')">✗ Fail</button>
+          <button class="s ${st=="skip"?"on":""}" onclick="mark('${s.id}','skip')">Skip</button>
+          <input placeholder="Notes (type here, or press ⌘V to paste a screenshot)" title="Paste a screenshot here with ⌘V. It attaches below this step." value="${esc((S[s.id]||{}).n)}" oninput="noteIt('${s.id}',this.value)">
+          <label class="addimg">📎 Add image<input type="file" accept="image/*" multiple style="display:none" onchange="addFiles('${s.id}',this.files);this.value=''"></label>
+        </div><div class="fixreq" id="fx${s.id}" style="display:${st=="fail"?"":"none"}"><div class="lbl f">What should change? (for the builder)</div><textarea rows="2" placeholder="e.g. The revenue tab should show $115K closed-won but shows $0. Re-link the opportunity to the project." oninput="fixIt('${s.id}',this.value)">${esc((S[s.id]||{}).x)}</textarea></div>
+        ${recHtml(s.id)}<div id="ai${s.id}">${aiHtml(s.id)}</div><div class="shots" id="sh${s.id}">${shotsHtml(s.id)}</div></div>`;
+      nav+=`<a href="#s${s.id}"><span class="dot ${st}" id="d${s.id}"></span>${s.id} ${strip(s.t)}</a>`;
+    });
+  });
+  document.getElementById("steps").innerHTML=h; document.getElementById("navlist").innerHTML=nav;
+  document.getElementById("t1").value=S._t1||""; setTimeout(vidUpd,0); document.getElementById("orgUrl").value=S._org||"";(CFG.record_links||[]).forEach(r=>{const el=document.getElementById("lk_"+r.key);if(el)el.value=(S._lk||{})[r.key]||"";}); stamp(); upd(); quick();
+}
+function mark(id,r){S[id]=S[id]||{};S[id].r=(S[id].r==r?"":r);save(false);
+  const el=document.getElementById("s"+id); el.className="step "+S[id].r;
+  el.querySelectorAll(".acts button").forEach(b=>b.classList.toggle("on",b.classList.contains(S[id].r=="pass"?"p":S[id].r=="fail"?"f":S[id].r=="skip"?"s":"x")));
+  document.getElementById("d"+id).className="dot "+S[id].r; upd(); const fx=document.getElementById("fx"+id); if(fx) fx.style.display=S[id].r=="fail"?"":"none";
+  if(S[id].r){const ids=PH.flatMap(p=>p.steps.map(s=>s.id));const nx=ids[ids.indexOf(id)+1];
+    if(nx){document.getElementById("s"+nx).scrollIntoView({behavior:"smooth",block:"center"});}}}
+function fixIt(id,v){S[id]=S[id]||{};S[id].x=v;save(true);}
+function noteIt(id,v){S[id]=S[id]||{};S[id].n=v;save(true);upd();}
+document.addEventListener("input",e=>{if(e.target.id=="t1"){S._t1=e.target.value;save(true);upd();}});
+function upd(){
+  const all=PH.flatMap(p=>p.steps), done=all.filter(s=>(S[s.id]||{}).r).length;
+  document.getElementById("count").textContent=`${done} / ${all.length} checked`;
+  document.getElementById("barfill").style.width=(100*done/all.length)+"%";
+  const fails=all.filter(s=>(S[s.id]||{}).r=="fail"), skips=all.filter(s=>(S[s.id]||{}).r=="skip");
+  let t=`${DEMO_LABEL} dry run: ${done}/${all.length} steps checked, ${fails.length} failed, ${skips.length} skipped.`;
+  t+=`\nTest record used: ${S._t1||"(not recorded)"}. ${GOLDEN} was left untouched.`;
+  if(fails.length){t+="\n\nFAILED:"; fails.forEach(s=>{t+=`\n- ${s.id}${s.scene!=null?" (Scene "+s.scene+")":""} ${strip(s.t)}${S[s.id].n?": "+S[s.id].n:""}${(S[s.id].img||[]).length?" ["+S[s.id].img.length+" screenshot(s) in JSON report]":""}`}); t+="\n\nCan you take a look at the failed items before the demo?";}
+  const notes=all.filter(s=>(S[s.id]||{}).r=="pass"&&(S[s.id]||{}).n);
+  if(notes.length){t+="\n\nNotes on passed steps:"; notes.forEach(s=>{t+=`\n- ${s.id}: ${S[s.id].n}`});}
+  document.getElementById("sumtext").textContent=done?t:"Nothing marked yet.";
+  const withImg=all.filter(s=>((S[s.id]||{}).img||[]).length);const g=document.getElementById("gallery");
+  if(g)g.innerHTML=withImg.length?withImg.map(s=>{const v=S[s.id],r=v.r||"unchecked";return `<div class="gstep"><div class="gh"><a href="#s${s.id}">${s.id} ${strip(s.t)}</a><span class="st ${r}">${r}</span>${v.n?` <span style="font-weight:400;color:var(--sub)">· ${esc(v.n)}</span>`:""}</div><div class="shots">${shotsHtml(s.id)}</div></div>`}).join(""):"None yet. Paste one into any step.";
+}
+function plain(x){return String(x||"").replace(/<button[^>]*>.*?<\/button>/g,"").replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim();}
+
+function AGENT_BRIEF(){return [
+ "You are fixing a Salesforce demo org before a live customer demo ("+DEMO_LABEL+"). This report comes from the presenter's dry run.",
+ "1. Work only the steps listed in fix_list, in order. For each one: read click (what they did), expected (what the script promises), tester_notes and screenshots (what actually happened) requested_fix (what they want) and ai_suggestion (a starting point to verify, not to trust blindly).",
+ "2. Where tester_notes or requested_fix disagree with expected, the presenter wins. Their version describes how the demo should actually work.",
+ "3. Never change the golden record ("+GOLDEN+") except to restore its starting state. Use the test record ("+(S._t1||"named in test_record")+") to test.",
+ "4. Don't change managed-package metadata. Only use subscriber-side config: fields, layouts, buttons, flows, data.",
+ ...(CFG.agent_rules||[]).map((r,i)=>"Org rule: "+r),
+ "5. 'Done' for a step = every line in its expected list is true in the org. Re-run the step's click path to prove it.",
+ "6. Reply as a table: step id | root cause | what you changed (metadata/data, API names) | how you verified | anything blocked. Then list any script or talk-track lines that need updating."
+].join("\n");}
+function buildReport(){
+  const steps=[]; let c={total:0,pass:0,fail:0,skip:0,unchecked:0};
+  PH.forEach(p=>p.steps.forEach(s=>{const v=S[s.id]||{}; const r=v.r||"unchecked"; c.total++; c[r]++;
+    steps.push({id:s.id, phase:plain(p.name), phase_type:p.tag=="safe"?"read-only (safe)":"changes data (test record only)",
+      title:plain(s.t), scene:(s.scene!=null?s.scene:null), click:s.c.map(plain), expected:s.e.map(plain),
+      if_not:plain(s.f)||null, result:r, tester_notes:v.n||null, requested_fix:v.x||null, ai_suggestion:v.ai||null, screenshots:(v.img||[])});}));
+  return {format:"demo-dry-run/v1", demo:DEMO_LABEL, golden_record:GOLDEN, test_record:S._t1||null,
+    exported_at:new Date().toISOString(), summary:c,
+    instructions_for_agent:"This is a pre-demo dry-run report written by the presenter. Each step lists what they clicked, what the demo script says they should see (expected), the troubleshooting hint (if_not), their result (pass / fail / skip / unchecked) and their own notes. Work through every step with result 'fail', and any step whose tester_notes ask for a change. Where tester_notes disagree with 'expected', the presenter's notes win: they describe how the demo should actually work. Do not modify the golden record ("+GOLDEN+") except to restore its starting state; use the test record for testing. Some steps include 'screenshots' (base64 JPEG data URLs) showing what the presenter actually saw. Reply with a list of what you changed per step id, and anything you could not do.",
+    agent_brief:AGENT_BRIEF(), fix_list:steps.filter(s=>s.result=="fail"||s.requested_fix||s.ai_suggestion).map(s=>s.id), steps};
+}
+
+function exportHtml(){const rep=buildReport();const e=x=>String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  const c=rep.summary, fx=rep.steps.filter(s=>rep.fix_list.includes(s.id)), shots=rep.steps.filter(s=>s.screenshots.length);
+  const li=a=>"<ul>"+a.map(x=>"<li>"+e(x)+"</li>").join("")+"</ul>";
+  const img=(s,i)=>`<figure><img src="${s.screenshots[i]}" alt="Step ${e(s.id)}: ${e(s.title)} (screenshot ${i+1})"><figcaption>${e(s.id)} · ${e(s.title)} · shot ${i+1}</figcaption></figure>`;
+  const card=(s,full)=>`<div class="s ${s.result}" id="step-${e(s.id)}"><div class="hd"><b>${e(s.id)}</b> ${e(s.title)} <span class="r">${s.result}</span></div><div class="ph">${e(s.phase)} · ${e(s.phase_type)}</div>
+   ${full?`<div class="k">Click</div>${li(s.click)}`:""}<div class="k">Expected (done when)</div>${li(s.expected)}
+   ${s.tester_notes?`<div class="k">What the presenter saw</div><div class="n">${e(s.tester_notes)}</div>`:""}
+   ${s.requested_fix?`<div class="k">Requested fix</div><div class="n fixn">${e(s.requested_fix)}</div>`:""}
+   ${s.ai_suggestion?`<div class="k">Suggested fix (AI)</div><div class="n" style="background:#eef4ea">${s.ai_suggestion.severity?"<b>"+e(s.ai_suggestion.severity)+"</b> · ":""}${s.ai_suggestion.root_cause?"<b>Cause:</b> "+e(s.ai_suggestion.root_cause)+"<br>":""}<b>Fix:</b> ${e(s.ai_suggestion.suggested_fix)}${(s.ai_suggestion.done_when||[]).length?"<br><b>Done when:</b> "+s.ai_suggestion.done_when.map(e).join(" · "):""}${s.ai_suggestion.talk_track?"<br><b>Talk track:</b> "+e(s.ai_suggestion.talk_track):""}</div>`:""}${s.if_not&&full?`<div class="k">Troubleshooting hint</div><div class="hint">${e(s.if_not)}</div>`:""}
+   ${s.screenshots.map((_,i)=>img(s,i)).join("")}</div>`;
+  const json=JSON.stringify(rep).replace(/</g,"\\u003c");
+  let h=`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${e(rep.demo)} · dry-run fix pack</title>
+<meta name="description" content="Demo dry-run fix pack. Machine-readable data is embedded in script#dryrun-report (JSON).">
+<style>body{font-family:-apple-system,Segoe UI,Arial,sans-serif;max-width:920px;margin:28px auto;padding:0 18px;color:#141413;background:#faf9f5;line-height:1.45}
+h1{font-family:Georgia,serif;font-weight:500;font-size:28px;margin:0}h2{font-family:Georgia,serif;font-weight:500;font-size:20px;margin:30px 0 8px;border-bottom:1px solid #e8e6dc;padding-bottom:6px}
+.meta{color:#6b6a65;font-size:13px;margin:6px 0 16px}.brief{background:#1f1e1d;color:#e8e6dc;border-radius:8px;padding:14px 16px;font:12.5px/1.55 ui-monospace,Menlo,monospace;white-space:pre-wrap}
+.s{background:#fff;border:1px solid #e8e6dc;border-left:4px solid #ccc;border-radius:8px;padding:12px 16px;margin:12px 0}.s.pass{border-left-color:#4a7c59}.s.fail{border-left-color:#b5452f}.s.skip{border-left-color:#8a8983}
+.hd b{font-family:ui-monospace,Menlo,monospace;color:#d97757}.ph{font-size:12px;color:#6b6a65}.r{font:700 10.5px ui-monospace,monospace;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:#eee}
+.pass .r{background:#eaf1e7;color:#4a7c59}.fail .r{background:#f8e6df;color:#b5452f}.k{font:600 10.5px ui-monospace,monospace;text-transform:uppercase;color:#6b6a65;margin-top:8px}
+ul{margin:2px 0;padding-left:18px}.n{background:#f6eedb;border-radius:6px;padding:6px 10px}.fixn{background:#f8e6df}.hint{background:#f5f4ee;border-radius:6px;padding:6px 10px;font-size:13px}
+figure{margin:10px 0}figure img{max-width:100%;border:1px solid #e8e6dc;border-radius:6px}figcaption{font:11.5px ui-monospace,monospace;color:#6b6a65}
+.toc a{color:#c96442;text-decoration:none;font-family:ui-monospace,monospace;font-size:13px}.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}</style></head><body>
+<h1>${e(rep.demo)} · dry-run fix pack</h1>
+<div class="meta">${new Date(rep.exported_at).toLocaleString()} · ${c.pass} passed · ${c.fail} failed · ${c.skip} skipped · ${c.unchecked} unchecked<br>Golden record (don't change): ${e(rep.golden_record)} · Test record: ${e(rep.test_record||"(not recorded)")}</div>
+<h2>1 · Instructions for the coding agent</h2><div class="brief">${e(rep.agent_brief)}
+
+Machine-readable copy: parse the JSON in &lt;script id="dryrun-report" type="application/json"&gt; at the bottom of this file. It's the same data as the downloaded .json report, screenshots included as base64 JPEG data URLs.</div>
+<h2>2 · Fix list (${fx.length})</h2>${fx.length?`<div class="toc">${fx.map(s=>`<a href="#step-${e(s.id)}">${e(s.id)} ${e(s.title)}</a>`).join(" · ")}</div>`+fx.map(s=>card(s,true)).join(""):"<p>Nothing failed. 🎉</p>"}
+<h2>3 · Storyboard (${shots.reduce((a,s)=>a+s.screenshots.length,0)} screenshots in demo order)</h2><p class="meta">Every screenshot in click-path order with its step title, ready to reuse for a recorded or AI-generated demo video.</p>
+<div class="board">${shots.map(s=>s.screenshots.map((_,i)=>img(s,i)).join("")).join("")}</div>
+<h2>4 · All steps</h2>${rep.steps.map(s=>card(s,true)).join("")}
+<script id="dryrun-report" type="application/json">${json}<\/script></body></html>`;
+  const b=new Blob([h],{type:"text/html"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=KEY+"-fixpack.html";a.click();toast("Fix pack downloaded ✓");}
+function exportNotes(){const rep=buildReport();const b=new Blob([JSON.stringify(rep,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=KEY+"-report.json";a.click();toast("Report downloaded ✓");}
+function applyReport(o){
+  if(o&&o.format&&Array.isArray(o.steps)){o.steps.forEach(st=>{const r=st.result=="unchecked"?"":st.result;if(r||st.tester_notes||st.requested_fix||st.ai_suggestion||(st.screenshots||[]).length)S[st.id]={r:r||"",n:st.tester_notes||"",x:st.requested_fix||"",ai:st.ai_suggestion||st.suggested_fix&&{severity:st.severity,root_cause:st.root_cause,suggested_fix:st.suggested_fix,done_when:st.done_when}||null,img:st.screenshots||[]};});
+    if(o.test_record)S._t1=o.test_record;}
+  else Object.assign(S,o);}
+function importNotes(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{let txt=r.result;const m=txt.match(/<script id="dryrun-report" type="application\/json">([\s\S]*?)<\/script>/);if(m)txt=m[1];applyReport(JSON.parse(txt));save(false);render();toast("Backup restored ✓");}catch(e){toast("That file couldn't be read",true);}};r.readAsText(f);}
+function resetAll(){if(confirm("Clear all pass/fail marks and notes? Back up first if you might need them.")){S={};save(false);render();}}
+function legacyCopy(text){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.top='-1000px';
+  document.body.appendChild(ta);ta.focus();ta.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){};document.body.removeChild(ta);return ok;}
+function cp(text,b){const done=ok=>{const o=b.textContent;b.textContent=ok?'Copied ✓':'Select & ⌘C';setTimeout(()=>b.textContent=o,1400);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>done(true)).catch(()=>done(legacyCopy(text)));}else done(legacyCopy(text));}
+function copySummary(b){cp(document.getElementById("sumtext").textContent,b);}
+hydrate();render();
+</script>
+</body>
+</html>
